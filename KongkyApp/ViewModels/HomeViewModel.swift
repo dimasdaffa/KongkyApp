@@ -55,7 +55,20 @@ class HomeViewModel: ObservableObject {
             joinedParticipants: 8
         )
         
-        self.events = [event1, event2, event3]
+        let event4 = Event(
+            title: "Pantry Tea Time",
+            description: "Chill afternoon catch-up over tea and snacks. Everyone welcome!",
+            location: "Common Room, Floor 3",
+            date: "Jun 22",
+            time: "15:00 - 18:00",
+            cost: 15000,
+            organizerName: "Alex Margarita",
+            category: "Tea Time",
+            maxCapacity: 8,
+            joinedParticipants: 3
+        )
+
+        self.events = [event1, event2, event3, event4]
         
     }
 }

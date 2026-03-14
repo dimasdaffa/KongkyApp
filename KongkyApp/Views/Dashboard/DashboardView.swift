@@ -62,11 +62,37 @@ struct DashboardView: View {
                         
                         // EVENT CARDS
                         VStack(spacing: 20) {
-                            ForEach(viewModel.events) { event in
-                                NavigationLink(destination: ActivityDetailView(event: event)) {
-                                    DashboardEventCard(event: event)
+                            // 1. We create a filtered list dynamically
+                            let filteredEvents = viewModel.events.filter { event in
+                                // Check if it matches the selected category (Assume "Recommended" means "Show All")
+                                let matchesCategory = selectedCategory == "Recommended" || event.category == selectedCategory
+                                
+                                // Check if it matches the search text
+                                let matchesSearch = searchText.isEmpty ||
+                                event.title.localizedCaseInsensitiveContains(searchText) ||
+                                event.location.localizedCaseInsensitiveContains(searchText)
+                                
+                                return matchesCategory && matchesSearch
+                            }
+                            
+                            // 2. We show an empty state if no events match
+                            if filteredEvents.isEmpty {
+                                VStack(spacing: 12) {
+                                    Image(systemName: "magnifyingglass")
+                                        .font(.largeTitle)
+                                        .foregroundColor(.gray)
+                                    Text("No activities found.")
+                                        .foregroundColor(.gray)
                                 }
-                                .buttonStyle(PlainButtonStyle())
+                                .padding(.top, 40)
+                            } else {
+                                // 3. We loop over the FILTERED array, not the main one
+                                ForEach(filteredEvents) { event in
+                                    NavigationLink(destination: ActivityDetailView(event: event)) {
+                                        DashboardEventCard(event: event)
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
                             }
                         }
                         .padding(.horizontal)

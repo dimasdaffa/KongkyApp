@@ -13,6 +13,8 @@ struct MyActivitiesView: View {
     // Controls which tab is active
     @State private var selectedTab = "Joined"
     let tabs = ["Joined", "Created"]
+    // Tracks which event we want to edit. If it's not nil, the sheet opens!
+    @State private var eventToEdit: Event?
     
     var body: some View {
         VStack {
@@ -32,8 +34,8 @@ struct MyActivitiesView: View {
                 // We pretend "Alex" is our logged-in user.
                 // If Created -> Show only Alex's events. If Joined -> Show others.
                 let filteredEvents = selectedTab == "Created"
-                    ? viewModel.events.filter { $0.organizerName == "Alex" }
-                    : viewModel.events.filter { $0.organizerName != "Alex" }
+                ? viewModel.events.filter { $0.organizerName == "Alex" }
+                : viewModel.events.filter { $0.organizerName != "Alex" }
                 
                 if filteredEvents.isEmpty {
                     Text("No activities found.")
@@ -46,7 +48,7 @@ struct MyActivitiesView: View {
                             .padding(.vertical, 4)
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
-                            // --- HIG NATIVE SWIPE ACTIONS ---
+                        // --- HIG NATIVE SWIPE ACTIONS ---
                             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                                 
                                 if selectedTab == "Created" {
@@ -57,9 +59,10 @@ struct MyActivitiesView: View {
                                         Label("Delete", systemImage: "trash")
                                     }
                                     
-                                    // 2. EDIT BUTTON (We make it Blue)
+                                    // 2. EDIT BUTTON
                                     Button {
-                                        print("Edit clicked for \(event.title)")
+                                        // Trigger the sheet by giving it the event!
+                                        eventToEdit = event
                                     } label: {
                                         Label("Edit", systemImage: "pencil")
                                     }
@@ -83,6 +86,10 @@ struct MyActivitiesView: View {
         .navigationBarTitleDisplayMode(.inline)
         //Hide the main bottom tab bar when deep in a profile menu!
         .toolbar(.hidden, for: .tabBar)
+        // Opens the Edit form whenever eventToEdit is populated
+        .sheet(item: $eventToEdit) { selectedEvent in
+            EditEventView(viewModel: viewModel, event: selectedEvent)
+        }
     }
     
     func deleteEvent(event: Event) {
