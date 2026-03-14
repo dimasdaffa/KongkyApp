@@ -114,7 +114,7 @@ struct ActivityDetailView: View {
                 }
             }
             .padding()
-            .background(.thinMaterial) // Apple's built-in frosted glass effect
+            .background(.thinMaterial) // Apple built-in frosted glass effect
             .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: -5)
         }
         .navigationTitle("Activity Detail")

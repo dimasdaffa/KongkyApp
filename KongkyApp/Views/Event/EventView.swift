@@ -11,7 +11,7 @@ struct EventView: View {
     @StateObject private var viewModel = HomeViewModel()
     
     var body: some View {
-        NavigationView{
+        NavigationStack{
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(viewModel.events) { event in

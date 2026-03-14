@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 32) {
                     
@@ -30,7 +30,10 @@ struct ProfileView: View {
                     .padding(.top, 20)
                     
                     VStack(spacing: 0) {
-                        ProfileRow(icon: "ticket.fill", title: "My Activities")
+                        NavigationLink(destination: MyActivitiesView()) {
+                            ProfileRow(icon: "ticket.fill", title: "My Activities")
+                        }
+                        .buttonStyle(PlainButtonStyle())
                         Divider()
                         ProfileRow(icon: "heart.fill", title: "Saved Events")
                         Divider()
