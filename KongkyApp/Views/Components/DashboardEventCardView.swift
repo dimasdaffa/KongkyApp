@@ -54,16 +54,30 @@ struct DashboardEventCard: View {
                         .font(.footnote)
                         .foregroundColor(.gray)
                 }
-                
                 Spacer()
-                
-                        HStack(spacing: -8) {
-                    ForEach(0..<4) { _ in
-                        Circle()
-                            .fill(Color.gray.opacity(0.3))
-                            .frame(width: 24, height: 24)
-                            .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                                
+                HStack(spacing: -8) {
+                    // 1. Calculate how many circles to draw (max 4)
+                    let displayCount = min(event.joinedParticipants, 4)
+                    
+                    if displayCount > 0 {
+                        ForEach(0..<displayCount, id: \.self) { index in
+                            Circle()
+                            // Added a fading opacity effect based on the index!
+                                .fill(Color.gray.opacity(0.8 - (Double(index) * 0.15)))
+                                .frame(width: 24, height: 24)
+                                .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                        }
                     }
+                }
+                
+                // 2. If there are more than 4, show the "+X" text!
+                if event.joinedParticipants > 4 {
+                    Text("+\(event.joinedParticipants - 4)")
+                        .font(.caption2)
+                        .fontWeight(.bold)
+                        .foregroundColor(.gray)
+                        .padding(.leading, 2)
                 }
             }
             .padding(.horizontal, 8)
@@ -78,14 +92,15 @@ struct DashboardEventCard: View {
 #Preview {
     DashboardEventCard(event: Event(
         title: "Board Game Night",
-        description: "The most unforgettable night you could have in your life is available on Thamrin Nine.",
+        description: "The most unforgettable night...",
         location: "Thamrin Nine",
         date: "12 Dec",
         time: "19:00",
         cost: 20000,
         organizerName: "Alex",
-        availableSeats: 5,
-        category: "Board Game"
+        category: "Board Game",
+        maxCapacity: 5,
+        joinedParticipants: 9 // Should show 4 circles and "+5"
     ))
     .padding()
 }

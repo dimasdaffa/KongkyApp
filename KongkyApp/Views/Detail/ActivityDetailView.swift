@@ -62,6 +62,37 @@ struct ActivityDetailView: View {
                 .cornerRadius(14)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
+                NavigationLink(destination: ParticipantsListView(event: event)) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Participants")
+                                                .font(.headline)
+                                                .foregroundColor(.primary)
+                                            
+                                            // Using our Laravel-style Accessors here!
+                                            Text("\(event.mainSlotsFilled)/\(event.maxCapacity) Slots Filled • \(event.queueCount) Mingling")
+                                                .font(.caption)
+                                                .foregroundColor(.gray)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        // Show total joined on the right side
+                                        Text("\(event.joinedParticipants) Joined")
+                                            .font(.subheadline)
+                                            .fontWeight(.bold)
+                                            .foregroundColor(.blue)
+                                        
+                                        Image(systemName: "chevron.right")
+                                            .foregroundColor(.gray.opacity(0.5))
+                                            .font(.footnote)
+                                    }
+                                    .padding()
+                                    .background(Color.white)
+                                    .cornerRadius(14)
+                                    .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                                }
+                
                 VStack(alignment: .leading, spacing: 16) {
                     Text("Details")
                         .font(.headline)
@@ -104,16 +135,17 @@ struct DetailRow: View {
 
 #Preview {
     NavigationView {
-            ActivityDetailView(event: Event(
-                title: "Bukber Bersama",
-                description: "Lunch together at the famous local spot. Don't forget to bring your appetite!",
-                location: "Sederhana Sudirman",
-                date: "Jun 20",
-                time: "12:00 - 13:00",
-                cost: 35000,
-                organizerName: "Dimas Daffa",
-                availableSeats: 4,
-                category: "Share Meal"
-            ))
-        }
+        ActivityDetailView(event: Event(
+            title: "Bukber Bersama",
+            description: "Lunch together at the famous local spot. Don't forget to bring your appetite!",
+            location: "Sederhana Sudirman",
+            date: "Jun 20",
+            time: "12:00 - 13:00",
+            cost: 35000,
+            organizerName: "Dimas Daffa",
+            category: "Share Meal",
+            maxCapacity: 5,
+            joinedParticipants: 8
+        ))
+    }
 }

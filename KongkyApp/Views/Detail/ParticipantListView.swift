@@ -7,12 +7,27 @@
 
 import SwiftUI
 
-struct ParticipantListView: View {
+struct ParticipantsListView: View {
+    let event: Event
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        List {
+            Section(header: Text("Main Slots (\(event.mainSlotsFilled)/\(event.maxCapacity))")) {
+                ForEach(0..<event.mainSlotsFilled, id: \.self) { _ in
+                    Text("Participant Name")
+                }
+            }
+            
+            if event.queueCount > 0 {
+                Section(header: Text("Mingling / Queue (\(event.queueCount))")) {
+                    ForEach(0..<event.queueCount, id: \.self) { _ in
+                        Text("Queue Member")
+                            .foregroundColor(.gray)
+                    }
+                }
+            }
+        }
+        .navigationTitle("Participants")
     }
 }
 
-#Preview {
-    ParticipantListView()
-}

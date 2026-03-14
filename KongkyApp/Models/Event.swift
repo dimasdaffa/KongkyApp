@@ -16,8 +16,9 @@ struct Event: Identifiable {
     let time: String
     let cost: Int
     let organizerName: String
-    let availableSeats: Int
     let category: String
+    let maxCapacity: Int
+    let joinedParticipants: Int
     
     var iconName: String {
         switch category.lowercased() {
@@ -34,6 +35,16 @@ struct Event: Identifiable {
         default:
             return "star.fill"
         }
+    }
+    
+    // How many of the main slots are taken? (Will never exceed maxCapacity)
+    var mainSlotsFilled: Int {
+        return min(joinedParticipants, maxCapacity)
+    }
+    
+    // How many people are in the mingling/queue section? (If negative, returns 0)
+    var queueCount: Int {
+        return max(0, joinedParticipants - maxCapacity)
     }
     
 }

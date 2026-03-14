@@ -24,8 +24,9 @@ class HomeViewModel: ObservableObject {
             time: "19:00 - 21:00",
             cost: 20000,
             organizerName: "Christoffer Wong",
-            availableSeats: 2,
-            category: "Board Game"
+            category: "Board Game",
+            maxCapacity: 5,
+            joinedParticipants: 8,
         )
         
         let event2 = Event(
@@ -36,8 +37,9 @@ class HomeViewModel: ObservableObject {
             time: "08:00 - 10:00",
             cost: 50000,
             organizerName: "Budi Santoso",
-            availableSeats: 10,
-            category: "Sport"
+            category: "Sport",
+            maxCapacity: 5,
+            joinedParticipants: 8,
         )
         
         let event3 = Event(
@@ -48,8 +50,9 @@ class HomeViewModel: ObservableObject {
             time: "16:00 - 19:00",
             cost: 35000,
             organizerName: "Dimas Daffa",
-            availableSeats: 4,
-            category: "Share Meal"
+            category: "Share Meal",
+            maxCapacity: 30,
+            joinedParticipants: 8
         )
         
         self.events = [event1, event2, event3]

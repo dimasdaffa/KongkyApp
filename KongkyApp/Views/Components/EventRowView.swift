@@ -53,7 +53,9 @@ struct EventRowView: View {
         time: "18:00 - 19:30",
         cost: 50000,
         organizerName: "Dimas",
-        availableSeats: 5,
-        category: "Tea Time"
+        category: "Tea Time",
+        maxCapacity: 10,
+        joinedParticipants: 12
     ))
+    .padding()
 }
