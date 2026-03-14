@@ -9,9 +9,15 @@ import SwiftUI
 
 @main
 struct KongkyApp: App {
+    @State private var showMainApp = false
+    
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            if showMainApp {
+                MainTabView()
+            } else {
+                SplashView(isActive: $showMainApp)
+            }
         }
     }
 }
