@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HomeView: View {
+struct EventView: View {
     @StateObject private var viewModel = HomeViewModel()
     
     var body: some View {
@@ -32,5 +32,5 @@ struct HomeView: View {
 }
 
 #Preview {
-    HomeView()
+    EventView()
 }
