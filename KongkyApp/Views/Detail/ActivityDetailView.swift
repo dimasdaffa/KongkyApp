@@ -39,7 +39,7 @@ struct ActivityDetailView: View {
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.white)
-                .cornerRadius(12)
+                .cornerRadius(14)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                 
                 HStack(spacing: 12){
@@ -77,7 +77,7 @@ struct ActivityDetailView: View {
                 }
                 .padding()
                 .background(Color.white)
-                .cornerRadius(12)
+                .cornerRadius(14)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
             }
             .padding()
@@ -113,7 +113,7 @@ struct DetailRow: View {
                 cost: 35000,
                 organizerName: "Dimas Daffa",
                 availableSeats: 4,
-                category: "Makan Bersama"
+                category: "Share Meal"
             ))
         }
 }

@@ -21,7 +21,7 @@ struct Event: Identifiable {
     
     var iconName: String {
         switch category.lowercased() {
-        case "board game ":
+        case "board game":
             return "gamecontroller.fill"
         case "tea time":
             return "cup.and.saucer.fill"

@@ -11,13 +11,13 @@ struct MainTabView: View {
     var body: some View {
         TabView {
             
-            CalendarView()
+            EventView()
                 .tabItem {
                     Image(systemName: "calendar")
-                    Text("Calendar")
+                    Text("Events")
                 }
             
-            HomeView()
+            DashboardView()
                 .tabItem {
                     Image(systemName: "house.fill")
                     Text("Home")

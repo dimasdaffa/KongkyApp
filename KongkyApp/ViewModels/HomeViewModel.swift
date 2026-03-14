@@ -41,15 +41,15 @@ class HomeViewModel: ObservableObject {
         )
         
         let event3 = Event(
-            title: "Makan Bersama Nasi Padang",
+            title: "Iftar Gathering",
             description: "Lunch together at the famous local spot.",
             location: "Sederhana Sudirman",
             date: "Jun 20",
-            time: "12:00 - 13:00",
+            time: "16:00 - 19:00",
             cost: 35000,
             organizerName: "Dimas Daffa",
             availableSeats: 4,
-            category: "Makan Bersama"
+            category: "Share Meal"
         )
         
         self.events = [event1, event2, event3]
