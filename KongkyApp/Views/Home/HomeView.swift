@@ -8,8 +8,26 @@
 import SwiftUI
 
 struct HomeView: View {
+    @StateObject private var viewModel = HomeViewModel()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationView{
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(viewModel.events) { event in
+                        NavigationLink(destination: ActivityDetailView(event: event)) {
+                            
+                            EventRowView(event: event)
+                            
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding()
+            }
+            .navigationTitle("All Events")
+            .navigationBarTitleDisplayMode(.inline)
+        }
     }
 }
 
