@@ -89,11 +89,12 @@ struct ActivityDetailView: View {
                 .padding()
             }
             
-            // 2. THE STICKY JOIN BUTTON AREA (UPDATED FOR GLASSMORPHISM)
+            // 2. THE STICKY JOIN BUTTON AREA
             VStack {
                 Button(action: {
                     // Action for joining activity
                     showJoinAlert = true
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }) {
                     Text("Join Activity")
                         .font(.headline)

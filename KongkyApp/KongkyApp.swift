@@ -14,7 +14,7 @@ struct KongkyApp: App {
     var body: some Scene {
         WindowGroup {
             if showMainApp {
-                MainTabView()
+                OnboardingInterestsView()
             } else {
                 SplashView(isActive: $showMainApp)
             }

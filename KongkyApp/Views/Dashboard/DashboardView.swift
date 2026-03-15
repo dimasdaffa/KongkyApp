@@ -52,7 +52,10 @@ struct DashboardView: View {
                                         .background(selectedCategory == category ? Color.gray.opacity(0.3) : Color.gray.opacity(0.1))
                                         .foregroundColor(selectedCategory == category ? .black : .gray)
                                         .cornerRadius(20)
-                                        .onTapGesture { selectedCategory = category }
+                                        .onTapGesture { 
+                                            selectedCategory = category 
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
                                 }
                             }
                             .padding(.horizontal)
