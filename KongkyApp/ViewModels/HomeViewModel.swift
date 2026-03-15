@@ -69,14 +69,27 @@ class HomeViewModel: ObservableObject {
             date: "Jun 28",
             time: "15:00 - 18:00",
             cost: 15000,
-            organizerName: "Alex Margarita",
+            organizerName: "Alex",
             category: "Tea Time",
             timeframe: "This Week",
             maxCapacity: 8,
             joinedParticipants: 3
         )
+        let event5 = Event(
+            title: "SwiftUI Jam Session",
+            description: "Let's build cool iOS apps together and share some knowledge!",
+            location: "Meeting Room A",
+            date: "Jun 30",
+            time: "14:00 - 16:00",
+            cost: 0,
+            organizerName: "Alex",
+            category: "Technology",
+            timeframe: "Next Week",
+            maxCapacity: 10,
+            joinedParticipants: 4
+        )
 
-        self.events = [event1, event2, event3, event4]
+        self.events = [event1, event2, event3, event4, event5]
         
     }
 }
