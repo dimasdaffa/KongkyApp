@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct EditEventView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -23,12 +24,55 @@ struct EditEventView: View {
     @State private var cost = ""
     @State private var category = "Board Game"
     @State private var maxCapacity = ""
+    // Image Picker
+    @State private var selectedItem: PhotosPickerItem? = nil
+    @State private var selectedImageData: Data? = nil
+    @State private var previewImage: UIImage? = nil
     
     let categories = ["Board Game", "Tea Time", "Sport", "Watch Party", "Share Meal"]
     
     var body: some View {
         NavigationStack {
             Form {
+                
+                // --- 3. NEW THUMBNAIL SECTION ---
+                Section(header: Text("Event Thumbnail")) {
+                    PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
+                        HStack(spacing: 16) {
+                            // If they picked an image, show it!
+                            if let previewImage {
+                                Image(uiImage: previewImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 60, height: 60)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                
+                                Text("Change Photo")
+                                    .foregroundColor(.blue)
+                            } 
+                            // Otherwise, show the default upload icon
+                            else {
+                                Image(systemName: "photo.badge.plus")
+                                    .font(.title)
+                                    .foregroundColor(.blue)
+                                
+                                Text("Select a photo")
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    // When the user picks a photo, this converts it to usable data!
+                    .onChange(of: selectedItem) { _, newItem in
+                        Task {
+                            if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                                selectedImageData = data
+                                previewImage = UIImage(data: data)
+                            }
+                        }
+                    }
+                }
+                
                 Section(header: Text("Basic Info")) {
                     TextField("Event Title", text: $title)
                     Picker("Category", selection: $category) {
