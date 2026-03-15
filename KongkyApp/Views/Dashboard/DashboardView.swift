@@ -19,13 +19,11 @@ struct DashboardView: View {
     var body: some View {
         NavigationStack {
             
-            // alignment: .bottomTrailing pushes our floating button to the bottom right
             ZStack(alignment: .bottomTrailing) {
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         
-                        // HEADER (Removed the + button from here)
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Welcome,")
                                 .font(.subheadline)
@@ -62,36 +60,36 @@ struct DashboardView: View {
                         
                         // EVENT CARDS
                         VStack(spacing: 20) {
-                            // 1. We create a filtered list dynamically
-                            let filteredEvents = viewModel.events.filter { event in
-                                // Check if it matches the selected category (Assume "Recommended" means "Show All")
-                                let matchesCategory = selectedCategory == "Recommended" || event.category == selectedCategory
-                                
-                                // Check if it matches the search text
-                                let matchesSearch = searchText.isEmpty ||
-                                event.title.localizedCaseInsensitiveContains(searchText) ||
-                                event.location.localizedCaseInsensitiveContains(searchText)
-                                
-                                return matchesCategory && matchesSearch
-                            }
                             
-                            // 2. We show an empty state if no events match
-                            if filteredEvents.isEmpty {
-                                VStack(spacing: 12) {
-                                    Image(systemName: "magnifyingglass")
-                                        .font(.largeTitle)
-                                        .foregroundColor(.gray)
-                                    Text("No activities found.")
-                                        .foregroundColor(.gray)
+                            // IF LOADING: Show Skeletons
+                            if viewModel.isLoading {
+                                ForEach(0..<3, id: \.self) { _ in
+                                    DashboardCardSkeleton()
                                 }
-                                .padding(.top, 40)
-                            } else {
-                                // 3. We loop over the FILTERED array, not the main one
-                                ForEach(filteredEvents) { event in
-                                    NavigationLink(destination: ActivityDetailView(event: event)) {
-                                        DashboardEventCard(event: event)
+                            } 
+                            // ELSE: Show Real Filtered Data
+                            else {
+                                let filteredEvents = viewModel.events.filter { event in
+                                    let matchesCategory = selectedCategory == "Recommended" || event.category == selectedCategory
+                                    let matchesSearch = searchText.isEmpty ||
+                                                        event.title.localizedCaseInsensitiveContains(searchText) ||
+                                                        event.location.localizedCaseInsensitiveContains(searchText)
+                                    return matchesCategory && matchesSearch
+                                }
+                                
+                                if filteredEvents.isEmpty {
+                                    VStack(spacing: 12) {
+                                        Image(systemName: "magnifyingglass").font(.largeTitle).foregroundColor(.gray)
+                                        Text("No activities found.").foregroundColor(.gray)
                                     }
-                                    .buttonStyle(PlainButtonStyle())
+                                    .padding(.top, 40)
+                                } else {
+                                    ForEach(filteredEvents) { event in
+                                        NavigationLink(destination: ActivityDetailView(event: event)) {
+                                            DashboardEventCard(event: event)
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
                                 }
                             }
                         }
@@ -100,7 +98,7 @@ struct DashboardView: View {
                     .padding(.bottom, 100)
                 }
                 
-                // 2. THE FLOATING ACTION BUTTON (Foreground layer)
+                // 2. THE FLOATING ACTION BUTTON
                 Button(action: {
                     showCreateForm = true
                 }) {
@@ -112,8 +110,8 @@ struct DashboardView: View {
                         .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 4)
                 }
-                .padding(.trailing, 20) // Spacing from the right edge
-                .padding(.bottom, 20)   // Spacing from the bottom edge
+                .padding(.trailing, 20)
+                .padding(.bottom, 20)
                 
             }
             .sheet(isPresented: $showCreateForm) {

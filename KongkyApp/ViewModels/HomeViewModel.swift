@@ -10,9 +10,13 @@ import Combine
 
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
+    @Published var isLoading: Bool = true
     
     init() {
-        loadDummyData()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            self.loadDummyData()
+            self.isLoading = false
+        }
     }
     
     func loadDummyData() {

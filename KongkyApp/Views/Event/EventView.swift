@@ -13,24 +13,36 @@ struct EventView: View {
     var body: some View {
         NavigationStack{
             ScrollView {
-                VStack(spacing: 16) {
-                    EventSectionView(
-                        title: "This Week",
-                        events: viewModel.events.filter { $0.timeframe == "This Week" }
-                    )
+                VStack(alignment: .leading, spacing: 24) {
                     
-                    // 2. "Next Week" Section
-                    EventSectionView(
-                        title: "Next Week",
-                        events: viewModel.events.filter { $0.timeframe == "Next Week" }
-                    )
+                    // IF LOADING: Show Skeletons
+                    if viewModel.isLoading {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("Loading Events...")
+                                .font(.headline)
+                                .foregroundColor(.gray)
+                                .padding(.leading, 4)
+                            
+                            VStack(spacing: 0) {
+                                ForEach(0..<4, id: \.self) { index in
+                                    EventListCellSkeleton()
+                                    if index < 3 {
+                                        Divider().padding(.leading, 90)
+                                    }
+                                }
+                            }
+                            .background(Color.white)
+                            .cornerRadius(14)
+                            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                        }
+                    } 
+                    // ELSE: Show Real Grouped Data
+                    else {
+                        EventSectionView(title: "This Week", events: viewModel.events.filter { $0.timeframe == "This Week" })
+                        EventSectionView(title: "Next Week", events: viewModel.events.filter { $0.timeframe == "Next Week" })
+                        EventSectionView(title: "Completed", events: viewModel.events.filter { $0.timeframe == "Completed" }, isCompleted: true)
+                    }
                     
-                    // 3. "Completed" Section (Notice we pass isCompleted: true)
-                    EventSectionView(
-                        title: "Completed",
-                        events: viewModel.events.filter { $0.timeframe == "Completed" },
-                        isCompleted: true
-                    )
                 }
                 .padding()
             }
@@ -69,7 +81,7 @@ struct EventSectionView: View {
                         // Add a dividing line between items (but not after the very last item)
                         if index < events.count - 1 {
                             Divider()
-                                .padding(.leading, 90) // Indents the line past the date box, just like Apple Mail!
+                                .padding(.leading, 90) // Indents the line past the date box
                         }
                     }
                 }
@@ -77,7 +89,7 @@ struct EventSectionView: View {
                 .cornerRadius(14)
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
             }
-            // MAGIC: If the section is "Completed", we fade the entire block to 50% opacity!
+            // If the section is "Completed", we fade the entire block to 50% opacity
             .opacity(isCompleted ? 0.5 : 1.0)
         }
     }
