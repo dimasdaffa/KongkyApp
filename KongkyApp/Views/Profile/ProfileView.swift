@@ -23,6 +23,11 @@ struct ProfileView: View {
                             .font(.title)
                             .fontWeight(.bold)
                         
+                        Text("Morning Session")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.blue)
+                        
                         Text("alex@example.com")
                             .font(.subheadline)
                             .foregroundColor(.gray)

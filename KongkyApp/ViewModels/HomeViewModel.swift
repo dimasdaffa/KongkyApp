@@ -25,6 +25,7 @@ class HomeViewModel: ObservableObject {
             cost: 20000,
             organizerName: "Christoffer Wong",
             category: "Board Game",
+            timeframe: "This Week",
             maxCapacity: 5,
             joinedParticipants: 8,
         )
@@ -33,11 +34,12 @@ class HomeViewModel: ObservableObject {
             title: "Sunday Morning Futsal",
             description: "Let's sweat it out this weekend!",
             location: "Kuningan Arena",
-            date: "Jun 18",
+            date: "Jun 24",
             time: "08:00 - 10:00",
             cost: 50000,
             organizerName: "Budi Santoso",
             category: "Sport",
+            timeframe: "Next Week",
             maxCapacity: 5,
             joinedParticipants: 8,
         )
@@ -46,11 +48,12 @@ class HomeViewModel: ObservableObject {
             title: "Iftar Gathering",
             description: "Lunch together at the famous local spot.",
             location: "Sederhana Sudirman",
-            date: "Jun 20",
+            date: "Jun 02",
             time: "16:00 - 19:00",
             cost: 35000,
             organizerName: "Dimas Daffa",
             category: "Share Meal",
+            timeframe: "Completed",
             maxCapacity: 30,
             joinedParticipants: 8
         )
@@ -59,11 +62,12 @@ class HomeViewModel: ObservableObject {
             title: "Pantry Tea Time",
             description: "Chill afternoon catch-up over tea and snacks. Everyone welcome!",
             location: "Common Room, Floor 3",
-            date: "Jun 22",
+            date: "Jun 28",
             time: "15:00 - 18:00",
             cost: 15000,
             organizerName: "Alex Margarita",
             category: "Tea Time",
+            timeframe: "This Week",
             maxCapacity: 8,
             joinedParticipants: 3
         )

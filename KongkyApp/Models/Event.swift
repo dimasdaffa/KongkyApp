@@ -16,7 +16,9 @@ struct Event: Identifiable {
     let time: String
     let cost: Int
     let organizerName: String
+    var organizerSession: String = "Afternoon Session"
     let category: String
+    var timeframe: String = "This Week"
     let maxCapacity: Int
     let joinedParticipants: Int
     

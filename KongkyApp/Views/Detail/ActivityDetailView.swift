@@ -48,6 +48,9 @@ struct ActivityDetailView: View {
                         VStack(alignment: .leading) {
                             Text("Event by").font(.caption).foregroundColor(.gray)
                             Text(event.organizerName).font(.headline)
+                            Text(event.organizerSession)
+                                .font(.caption)
+                                .foregroundColor(.blue)
                         }
                         Spacer()
                     }
@@ -104,7 +107,7 @@ struct ActivityDetailView: View {
                                 endPoint: .bottom
                             )
                         )
-                        // A frosted glass material blur directly behind the gradient
+                    // A frosted glass material blur directly behind the gradient
                         .background(.ultraThinMaterial)
                         .overlay(
                             RoundedRectangle(cornerRadius: 14)
