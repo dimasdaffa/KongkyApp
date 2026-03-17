@@ -56,33 +56,143 @@ struct ActivityDetailView: View {
                     }
                     .padding().background(Color.white).cornerRadius(14).shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
                     
-                    NavigationLink(destination: ParticipantsListView(event: event)) {
+                // ---------------------------------------------------------
+                // 1. PARTICIPANTS VISUALIZER CARD (Now Clickable & Fixed!)
+                // ---------------------------------------------------------
+                NavigationLink(destination: ParticipantsListView(event: event)) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        
+                        // The Pill Header & Chevron
                         HStack {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Participants").font(.headline).foregroundColor(.primary)
-                                Text("\(event.mainSlotsFilled)/\(event.maxCapacity) Slots Filled • \(event.queueCount) Mingling").font(.caption).foregroundColor(.gray)
-                            }
+                            Label("Participants", systemImage: "person.2")
+                                .font(.subheadline)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.gray.opacity(0.1))
+                                .cornerRadius(20)
+                                .foregroundColor(.primary)
                             
                             Spacer()
                             
-                            Text("\(event.joinedParticipants) Joined").font(.subheadline).fontWeight(.bold).foregroundColor(.blue)
-                            
-                            Image(systemName: "chevron.right").foregroundColor(.gray.opacity(0.5)).font(.footnote)
+                            // Visual hint that this card is clickable
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.gray)
+                                .font(.caption)
                         }
-                        .padding().background(Color.white).cornerRadius(14).shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                        
+                        HStack {
+                            // The Overlapping Circles (Limited to 4 circles max to prevent squishing)
+                            let displayCount = min(event.maxCapacity, 4)
+                            HStack(spacing: -12) { // Slightly tighter overlap
+                                ForEach(0..<displayCount, id: \.self) { index in
+                                    Circle()
+                                        .fill(index < event.mainSlotsFilled ? Color.gray.opacity(0.3) : Color.white)
+                                        .frame(width: 38, height: 38) // Slightly smaller circles
+                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                                }
+                                
+                                // If capacity is larger than 4, show a +X indicator
+                                if event.maxCapacity > 4 {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.1))
+                                        .frame(width: 38, height: 38)
+                                        .overlay(
+                                            Text("+\(event.maxCapacity - 4)")
+                                                .font(.caption2)
+                                                .foregroundColor(.gray)
+                                        )
+                                }
+                            }
+                            
+                            Spacer(minLength: 12)
+                            
+                            // The Call to Action Text
+                            let availableSeats = event.maxCapacity - event.mainSlotsFilled
+                            if availableSeats > 0 {
+                                // Grouped in a VStack so it aligns nicely
+                                VStack(alignment: .trailing, spacing: 2) {
+                                    Text("\(availableSeats) more seats available,")
+                                        .foregroundColor(.gray)
+                                        .font(.caption)
+                                    Text("book now!")
+                                        .foregroundColor(.gray)
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                }
+                                // MAGIC FIX: Tells SwiftUI this text MUST have enough room!
+                                .layoutPriority(1) 
+                            } else {
+                                Text("Fully booked!")
+                                    .foregroundColor(.gray)
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .layoutPriority(1)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(16)
+                }
+                .buttonStyle(PlainButtonStyle()) // Keeps text from turning blue like a standard link
+                
+                // ---------------------------------------------------------
+                // 2. PRICING & DETAILS CARD (Location restored!)
+                // ---------------------------------------------------------
+                VStack(alignment: .leading, spacing: 16) {
+                    
+                    Label("Details", systemImage: "square.grid.2x2")
+                        .font(.subheadline)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(20)
+                    
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Individual Price").font(.headline)
+                            if event.mainSlotsFilled < event.maxCapacity {
+                                HStack(spacing: 2) {
+                                    Text("Invite more to become \(event.formatPrice(event.nextIndividualPrice)) / pax")
+                                        .font(.caption).italic().foregroundColor(.gray)
+                                    Image(systemName: "arrow.down.right")
+                                        .font(.caption2).foregroundColor(.gray)
+                                }
+                            }
+                        }
+                        Spacer()
+                        Text("\(event.formatPrice(event.currentIndividualPrice)) IDR / pax")
+                            .foregroundColor(.gray)
                     }
                     
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Details").font(.headline).padding(.bottom, 4)
-                        DetailRow(title: "Cost", value: "Rp \(event.cost) / pax")
-                        Divider()
-                        DetailRow(title: "Date", value: event.date.replacingOccurrences(of: "\n", with: " "))
-                        Divider()
-                        DetailRow(title: "Time", value: event.time)
-                        Divider()
-                        DetailRow(title: "Place", value: event.location)
+                    Divider()
+                    
+                    HStack {
+                        Text("Total Price").font(.headline)
+                        Spacer()
+                        Text("\(event.formatPrice(event.cost)) IDR").foregroundColor(.gray)
                     }
-                    .padding().background(Color.white).cornerRadius(14).shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    
+                    Divider()
+                    
+                    HStack {
+                        Text("Date").font(.headline)
+                        Spacer()
+                        Text(event.date).foregroundColor(.gray)
+                    }
+                    
+                    Divider()
+                    
+                    // --- RESTORED LOCATION ROW ---
+                    HStack {
+                        Text("Location").font(.headline)
+                        Spacer()
+                        Text(event.location).foregroundColor(.gray)
+                    }
+                }
+                .padding()
+                .background(Color.white)
+                .cornerRadius(16)
                     
                     Color.clear.frame(height: 100)
                 }

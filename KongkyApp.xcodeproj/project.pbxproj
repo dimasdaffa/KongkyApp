@@ -6,6 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		388928242F6712DD00AD4939 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 388928232F6712DD00AD4939 /* FirebaseFirestore */; };
+		388928262F6712DD00AD4939 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 388928252F6712DD00AD4939 /* FirebaseStorage */; };
+		388928292F67132F00AD4939 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 388928282F67132F00AD4939 /* SDWebImageSwiftUI */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		383FE3022F652BE50002059B /* KongkyApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KongkyApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +29,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				388928292F67132F00AD4939 /* SDWebImageSwiftUI in Frameworks */,
+				388928242F6712DD00AD4939 /* FirebaseFirestore in Frameworks */,
+				388928262F6712DD00AD4939 /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -33,6 +42,7 @@
 			isa = PBXGroup;
 			children = (
 				383FE3042F652BE50002059B /* KongkyApp */,
+				388928222F6712DD00AD4939 /* Frameworks */,
 				383FE3032F652BE50002059B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -43,6 +53,13 @@
 				383FE3022F652BE50002059B /* KongkyApp.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		388928222F6712DD00AD4939 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -65,6 +82,9 @@
 			);
 			name = KongkyApp;
 			packageProductDependencies = (
+				388928232F6712DD00AD4939 /* FirebaseFirestore */,
+				388928252F6712DD00AD4939 /* FirebaseStorage */,
+				388928282F67132F00AD4939 /* SDWebImageSwiftUI */,
 			);
 			productName = KongkyApp;
 			productReference = 383FE3022F652BE50002059B /* KongkyApp.app */;
@@ -94,6 +114,10 @@
 			);
 			mainGroup = 383FE2F92F652BE50002059B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				38D1AEC12F670BB000DE83B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				388928272F67132F00AD4939 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 383FE3032F652BE50002059B /* Products */;
 			projectDirPath = "";
@@ -332,6 +356,43 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		388928272F67132F00AD4939 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.4;
+			};
+		};
+		38D1AEC12F670BB000DE83B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.10.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		388928232F6712DD00AD4939 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 38D1AEC12F670BB000DE83B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		388928252F6712DD00AD4939 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 38D1AEC12F670BB000DE83B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		388928282F67132F00AD4939 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 388928272F67132F00AD4939 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 383FE2FA2F652BE50002059B /* Project object */;
 }
