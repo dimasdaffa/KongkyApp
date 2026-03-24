@@ -19,14 +19,25 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 @main
 struct KongkyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
-    @State private var showMainApp = false
+    
+    // 1. Tracks if the splash animation is done
+    @State private var splashFinished = false
+    
+    // 2. Tracks if the user is logged in
+    @State private var isAuthenticated = false
     
     var body: some Scene {
         WindowGroup {
-            if showMainApp {
-                OnboardingInterestsView()
+            // The ultimate routing logic!
+            if !splashFinished {
+                // Show Splash first
+                SplashView(isActive: $splashFinished)
+            } else if !isAuthenticated {
+                // If splash is done but they aren't logged in, show Auth!
+                LoginView(isAuthenticated: $isAuthenticated)
             } else {
-                SplashView(isActive: $showMainApp)
+                // If they are logged in, send them into the app!
+                OnboardingInterestsView()
             }
         }
     }
