@@ -39,7 +39,7 @@ struct MyActivitiesView: View {
                 
                 if filteredEvents.isEmpty {
                     Text("No activities found.")
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .padding(.top, 40)
                         .listRowSeparator(.hidden)
                 } else {

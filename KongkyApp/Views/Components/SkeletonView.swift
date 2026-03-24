@@ -89,9 +89,9 @@ struct DashboardCardSkeleton: View {
             }
             .padding(.horizontal, 8).padding(.bottom, 12)
         }
-        .background(Color.white)
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(14)
-        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: 2)
     }
 }
 
@@ -108,7 +108,7 @@ struct EventListCellSkeleton: View {
             Spacer()
         }
         .padding()
-        .background(Color.white)
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(14)
     }
 }
@@ -129,7 +129,7 @@ struct EventListCellSkeleton: View {
                 Spacer()
             }
             .padding()
-            .background(Color.white)
+            .background(Color(.secondarySystemBackground))
             .cornerRadius(14)
         }
         .padding()

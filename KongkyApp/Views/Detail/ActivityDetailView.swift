@@ -23,13 +23,13 @@ struct ActivityDetailView: View {
                     
                     // (Image placeholder section...)
                     Rectangle()
-                        .fill(Color.gray.opacity(0.3))
+                        .fill(Color(.systemGray5))
                         .frame(height: 250)
                         .cornerRadius(14)
                         .overlay(
                             Image(systemName: "photo")
                                 .font(.largeTitle)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                         )
                     
                     VStack(alignment: .leading, spacing: 12) {
@@ -38,15 +38,15 @@ struct ActivityDetailView: View {
                             Text(event.title).font(.title2).fontWeight(.bold)
                         }
                         
-                        Text(event.description).font(.body).foregroundColor(.gray).lineSpacing(4)
+                        Text(event.description).font(.body).foregroundColor(.secondary).lineSpacing(4)
                     }
-                    .padding().frame(maxWidth: .infinity, alignment: .leading).background(Color.white).cornerRadius(14).shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    .padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.secondarySystemBackground)).cornerRadius(14).shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
                     
                     HStack(spacing: 12) {
                         Circle().fill(Color.gray.opacity(0.4)).frame(width: 50, height: 50).overlay(Image(systemName: "person.fill").foregroundColor(.white))
                         
                         VStack(alignment: .leading) {
-                            Text("Event by").font(.caption).foregroundColor(.gray)
+                            Text("Event by").font(.caption).foregroundColor(.secondary)
                             Text(event.organizerName).font(.headline)
                             Text(event.organizerSession)
                                 .font(.caption)
@@ -54,7 +54,7 @@ struct ActivityDetailView: View {
                         }
                         Spacer()
                     }
-                    .padding().background(Color.white).cornerRadius(14).shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    .padding().background(Color(.secondarySystemBackground)).cornerRadius(14).shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
                     
                 // ---------------------------------------------------------
                 // 1. PARTICIPANTS VISUALIZER CARD (Now Clickable & Fixed!)
@@ -68,7 +68,7 @@ struct ActivityDetailView: View {
                                 .font(.subheadline)
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 6)
-                                .background(Color.gray.opacity(0.1))
+                                .background(Color(.tertiarySystemFill))
                                 .cornerRadius(20)
                                 .foregroundColor(.primary)
                             
@@ -76,7 +76,7 @@ struct ActivityDetailView: View {
                             
                             // Visual hint that this card is clickable
                             Image(systemName: "chevron.right")
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .font(.caption)
                         }
                         
@@ -86,7 +86,7 @@ struct ActivityDetailView: View {
                             HStack(spacing: -12) { // Slightly tighter overlap
                                 ForEach(0..<displayCount, id: \.self) { index in
                                     Circle()
-                                        .fill(index < event.mainSlotsFilled ? Color.gray.opacity(0.3) : Color.white)
+                                        .fill(index < event.mainSlotsFilled ? Color(.systemGray4) : Color(.systemBackground))
                                         .frame(width: 38, height: 38) // Slightly smaller circles
                                         .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
                                 }
@@ -94,12 +94,12 @@ struct ActivityDetailView: View {
                                 // If capacity is larger than 4, show a +X indicator
                                 if event.maxCapacity > 4 {
                                     Circle()
-                                        .fill(Color.gray.opacity(0.1))
+                                        .fill(Color(.tertiarySystemFill))
                                         .frame(width: 38, height: 38)
                                         .overlay(
                                             Text("+\(event.maxCapacity - 4)")
                                                 .font(.caption2)
-                                                .foregroundColor(.gray)
+                                                .foregroundColor(.secondary)
                                         )
                                 }
                             }
@@ -112,10 +112,10 @@ struct ActivityDetailView: View {
                                 // Grouped in a VStack so it aligns nicely
                                 VStack(alignment: .trailing, spacing: 2) {
                                     Text("\(availableSeats) more seats available,")
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.secondary)
                                         .font(.caption)
                                     Text("book now!")
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(.secondary)
                                         .font(.caption)
                                         .fontWeight(.bold)
                                 }
@@ -123,7 +123,7 @@ struct ActivityDetailView: View {
                                 .layoutPriority(1) 
                             } else {
                                 Text("Fully booked!")
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(.secondary)
                                     .font(.caption)
                                     .fontWeight(.bold)
                                     .layoutPriority(1)
@@ -131,7 +131,7 @@ struct ActivityDetailView: View {
                         }
                     }
                     .padding()
-                    .background(Color.white)
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(16)
                 }
                 .buttonStyle(PlainButtonStyle()) // Keeps text from turning blue like a standard link
@@ -145,7 +145,7 @@ struct ActivityDetailView: View {
                         .font(.subheadline)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(Color.gray.opacity(0.1))
+                        .background(Color(.tertiarySystemFill))
                         .cornerRadius(20)
                     
                     HStack(alignment: .top) {
@@ -154,15 +154,15 @@ struct ActivityDetailView: View {
                             if event.mainSlotsFilled < event.maxCapacity {
                                 HStack(spacing: 2) {
                                     Text("Invite more to become \(event.formatPrice(event.nextIndividualPrice)) / pax")
-                                        .font(.caption).italic().foregroundColor(.gray)
+                                        .font(.caption).italic().foregroundColor(.secondary)
                                     Image(systemName: "arrow.down.right")
-                                        .font(.caption2).foregroundColor(.gray)
+                                        .font(.caption2).foregroundColor(.secondary)
                                 }
                             }
                         }
                         Spacer()
                         Text("\(event.formatPrice(event.currentIndividualPrice)) IDR / pax")
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     }
                     
                     Divider()
@@ -170,7 +170,7 @@ struct ActivityDetailView: View {
                     HStack {
                         Text("Total Price").font(.headline)
                         Spacer()
-                        Text("\(event.formatPrice(event.cost)) IDR").foregroundColor(.gray)
+                        Text("\(event.formatPrice(event.cost)) IDR").foregroundColor(.secondary)
                     }
                     
                     Divider()
@@ -178,7 +178,7 @@ struct ActivityDetailView: View {
                     HStack {
                         Text("Date").font(.headline)
                         Spacer()
-                        Text(event.date).foregroundColor(.gray)
+                        Text(event.date).foregroundColor(.secondary)
                     }
                     
                     Divider()
@@ -187,11 +187,11 @@ struct ActivityDetailView: View {
                     HStack {
                         Text("Location").font(.headline)
                         Spacer()
-                        Text(event.location).foregroundColor(.gray)
+                        Text(event.location).foregroundColor(.secondary)
                     }
                 }
                 .padding()
-                .background(Color.white)
+                .background(Color(.secondarySystemBackground))
                 .cornerRadius(16)
                     
                     Color.clear.frame(height: 100)
@@ -229,7 +229,7 @@ struct ActivityDetailView: View {
             }
             .padding()
             .background(.thinMaterial) // Apple built-in frosted glass effect
-            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: -5)
+            .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: -5)
         }
         .navigationTitle("Activity Detail")
         .navigationBarTitleDisplayMode(.inline)
@@ -251,7 +251,7 @@ struct DetailRow: View {
         HStack {
             Text(title).fontWeight(.semibold)
             Spacer()
-            Text(value).foregroundColor(.gray)
+            Text(value).foregroundColor(.secondary)
         }
     }
 }

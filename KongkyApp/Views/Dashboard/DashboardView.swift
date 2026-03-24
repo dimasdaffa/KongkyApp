@@ -27,7 +27,7 @@ struct DashboardView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Welcome,")
                                 .font(.subheadline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                             Text("Alex")
                                 .font(.largeTitle)
                                 .fontWeight(.bold)
@@ -37,10 +37,10 @@ struct DashboardView: View {
                         
                         // SEARCH BAR
                         HStack {
-                            Image(systemName: "magnifyingglass").foregroundColor(.gray)
+                            Image(systemName: "magnifyingglass").foregroundColor(.secondary)
                             TextField("Search...", text: $searchText)
                         }
-                        .padding(14).background(Color.gray.opacity(0.1)).cornerRadius(25).padding(.horizontal)
+                        .padding(14).background(Color(.secondarySystemBackground)).cornerRadius(25).padding(.horizontal)
                         
                         // CATEGORY PILLS
                         ScrollView(.horizontal, showsIndicators: false) {
@@ -49,8 +49,8 @@ struct DashboardView: View {
                                     Text(category)
                                         .fontWeight(.semibold)
                                         .padding(.horizontal, 20).padding(.vertical, 10)
-                                        .background(selectedCategory == category ? Color.gray.opacity(0.3) : Color.gray.opacity(0.1))
-                                        .foregroundColor(selectedCategory == category ? .black : .gray)
+                                        .background(selectedCategory == category ? Color(.systemGray4) : Color(.tertiarySystemFill))
+                                        .foregroundColor(selectedCategory == category ? .primary : .secondary)
                                         .cornerRadius(20)
                                         .onTapGesture { 
                                             selectedCategory = category 
@@ -82,8 +82,8 @@ struct DashboardView: View {
                                 
                                 if filteredEvents.isEmpty {
                                     VStack(spacing: 12) {
-                                        Image(systemName: "magnifyingglass").font(.largeTitle).foregroundColor(.gray)
-                                        Text("No activities found.").foregroundColor(.gray)
+                                        Image(systemName: "magnifyingglass").font(.largeTitle).foregroundColor(.secondary)
+                                        Text("No activities found.").foregroundColor(.secondary)
                                     }
                                     .padding(.top, 40)
                                 } else {
@@ -109,7 +109,7 @@ struct DashboardView: View {
                         .font(.title)
                         .foregroundColor(.white)
                         .frame(width: 60, height: 60) // Standard FAB size
-                        .background(Color.black)
+                        .background(Color.primary)
                         .clipShape(Circle())
                         .shadow(color: Color.black.opacity(0.3), radius: 5, x: 0, y: 4)
                 }

@@ -15,7 +15,7 @@ struct EventRowView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Image(systemName: event.iconName)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                     Text(event.title)
                         .font(.headline)
                         .fontWeight(.bold)
@@ -23,7 +23,7 @@ struct EventRowView: View {
                 
                 Text("\(event.location) | \(event.time)")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             
             Spacer()
@@ -38,9 +38,9 @@ struct EventRowView: View {
                 .cornerRadius(8)
         }
         .padding()
-        .background(Color.white)
+        .background(Color(.secondarySystemBackground))
         .cornerRadius(14)
-        .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+        .shadow(color: Color.primary.opacity(0.1), radius: 4, x: 0, y: 2)
     }
 }
 

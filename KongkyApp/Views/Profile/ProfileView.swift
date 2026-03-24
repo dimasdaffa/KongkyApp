@@ -30,7 +30,7 @@ struct ProfileView: View {
                         
                         Text("alex@example.com")
                             .font(.subheadline)
-                            .foregroundColor(.gray)
+                            .foregroundColor(.secondary)
                     }
                     .padding(.top, 20)
                     
@@ -47,16 +47,16 @@ struct ProfileView: View {
                         
                         ProfileRow(icon: "arrow.right.square.fill", title: "Log Out", isDestructive: true)
                     }
-                    .background(Color.white)
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(14)
                     .padding(.horizontal)
-                    .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                    .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: 2)
                     
                     Spacer()
                 }
             }
             // A slightly gray background makes the white menu card "pop"
-            .background(Color.gray.opacity(0.05).ignoresSafeArea())
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
         }

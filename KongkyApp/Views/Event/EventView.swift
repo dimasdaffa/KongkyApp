@@ -20,7 +20,7 @@ struct EventView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Loading Events...")
                                 .font(.headline)
-                                .foregroundColor(.gray)
+                                .foregroundColor(.secondary)
                                 .padding(.leading, 4)
                             
                             VStack(spacing: 0) {
@@ -31,9 +31,9 @@ struct EventView: View {
                                     }
                                 }
                             }
-                            .background(Color.white)
+                            .background(Color(.secondarySystemBackground))
                             .cornerRadius(14)
-                            .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                            .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
                         }
                     } 
                     // ELSE: Show Real Grouped Data
@@ -48,7 +48,7 @@ struct EventView: View {
             }
             .navigationTitle("All Events")
             .navigationBarTitleDisplayMode(.inline)
-            .background(Color.gray.opacity(0.05).ignoresSafeArea())
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
         }
     }
 }
@@ -85,9 +85,9 @@ struct EventSectionView: View {
                         }
                     }
                 }
-                .background(Color.white)
+                .background(Color(.secondarySystemBackground))
                 .cornerRadius(14)
-                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
+                .shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
             }
             // If the section is "Completed", we fade the entire block to 50% opacity
             .opacity(isCompleted ? 0.5 : 1.0)
@@ -114,7 +114,7 @@ struct EventListCell: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack {
                     Image(systemName: event.iconName)
-                        .foregroundColor(.gray)
+                        .foregroundColor(.secondary)
                         .font(.subheadline)
                     Text(event.title)
                         .font(.headline)
@@ -123,7 +123,7 @@ struct EventListCell: View {
                 
                 Text("\(event.location) / \(event.time)")
                     .font(.subheadline)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
             }
             
             Spacer()

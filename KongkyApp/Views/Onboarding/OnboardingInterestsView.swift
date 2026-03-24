@@ -34,7 +34,7 @@ struct OnboardingInterestsView: View {
                 
                 Text("Pick your favorite activities so we can recommend the best events for you.")
                     .font(.body)
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
                     .lineSpacing(4)
             }
             .padding(.top, 40)
@@ -63,7 +63,7 @@ struct OnboardingInterestsView: View {
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
                             // Change colors based on whether it's selected
-                                .background(isSelected ? Color.blue : Color.gray.opacity(0.1))
+                                .background(isSelected ? Color.blue : Color(.tertiarySystemFill))
                                 .foregroundColor(isSelected ? .white : .primary)
                                 .cornerRadius(14)
                             // A fun, subtle bounce effect when selected
@@ -88,15 +88,15 @@ struct OnboardingInterestsView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                     // If they haven't picked anything, gray it out!
-                        .background(selectedCategories.isEmpty ? Color.gray.opacity(0.5) : Color.black)
+                        .background(selectedCategories.isEmpty ? Color.gray.opacity(0.5) : Color.primary)
                         .cornerRadius(14)
                 }
                 // Disable the button until they pick at least one thing
                 .disabled(selectedCategories.isEmpty)
             }
             .padding()
-            .background(Color.white)
-            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: -5)
+            .background(Color(.systemBackground))
+            .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: -5)
         }
         .fullScreenCover(isPresented: $navigateToHome) {
             MainTabView()

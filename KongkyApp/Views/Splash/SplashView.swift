@@ -15,16 +15,16 @@ struct SplashView: View {
     let appName = Array("Kongky")
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            Color(.systemBackground).ignoresSafeArea()
             
             VStack(spacing: 20) {
                 ZStack {
                     Circle()
-                        .fill(Color.black)
+                        .fill(Color.primary)
                         .frame(width: 80, height: 80)
                     Text("K")
                         .font(.system(size: 40, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color(.systemBackground))
                 }
                 .offset(y: animateLogo ? 0 : -50)
                 .opacity(animateLogo ? 1 : 0)
