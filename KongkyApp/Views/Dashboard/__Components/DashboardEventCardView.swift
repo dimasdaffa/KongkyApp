@@ -10,13 +10,31 @@ import SwiftUI
 struct DashboardEventCard: View {
     let event: Event
     
+    @State private var isSaved: Bool = false
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             
-            Rectangle()
-                .fill(Color(.systemGray5))
-                .frame(height: 160)
-                .cornerRadius(14)
+            ZStack(alignment: .topTrailing) {
+                Rectangle()
+                    .fill(Color(.systemGray5))
+                    .frame(height: 160)
+                    .cornerRadius(14)
+                
+                // The Heart Button Overlay
+                Button(action: {
+                    isSaved.toggle()
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred() // Haptic tap!
+                }) {
+                    Image(systemName: isSaved ? "heart.fill" : "heart")
+                        .font(.title3)
+                        .foregroundColor(isSaved ? .red : .gray)
+                        .padding(10)
+                        .background(.ultraThinMaterial) // Frosted glass circle
+                        .clipShape(Circle())
+                }
+                .padding(12)
+            }
             
             VStack(alignment: .leading, spacing: 4) {
                 
@@ -55,7 +73,7 @@ struct DashboardEventCard: View {
                         .foregroundColor(.secondary)
                 }
                 Spacer()
-                                
+                
                 HStack(spacing: -8) {
                     // 1. Calculate how many circles to draw (max 4)
                     let displayCount = min(event.joinedParticipants, 4)
@@ -86,6 +104,9 @@ struct DashboardEventCard: View {
         .background(Color(.secondarySystemBackground))
         .cornerRadius(14)
         .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: 2)
+        .onAppear {
+                    isSaved = event.isSaved
+                }
     }
 }
 
@@ -100,7 +121,7 @@ struct DashboardEventCard: View {
         organizerName: "Alex",
         category: "Board Game",
         maxCapacity: 5,
-        joinedParticipants: 9 // Should show 4 circles and "+5"
+        joinedParticipants: 9, // Should show 4 circles and "+5"
     ))
     .padding()
 }

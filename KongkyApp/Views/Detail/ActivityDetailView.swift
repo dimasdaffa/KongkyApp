@@ -10,6 +10,7 @@ import SwiftUI
 struct ActivityDetailView: View {
     let event: Event
     
+    @State private var isSaved = false
     @State private var showJoinAlert = false
     
     var body: some View {
@@ -234,6 +235,20 @@ struct ActivityDetailView: View {
         .navigationTitle("Activity Detail")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar) // Remove Tab Bar on Page
+        .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            isSaved.toggle()
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        }) {
+                            Image(systemName: isSaved ? "heart.fill" : "heart")
+                                .foregroundColor(isSaved ? .red : .secondary)
+                        }
+                    }
+                }
+                .onAppear {
+                    isSaved = event.isSaved
+                }
         .alert(isPresented: $showJoinAlert) {
             Alert(
                 title: Text("Success!"),

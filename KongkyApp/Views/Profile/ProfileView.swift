@@ -41,7 +41,10 @@ struct ProfileView: View {
                         .buttonStyle(PlainButtonStyle())
                         Divider()
                         
-                        ProfileRow(icon: "heart.fill", title: "Saved Events")
+                        NavigationLink(destination: SavedEventsView()) {
+                            ProfileRow(icon: "heart.fill", title: "Saved Events")
+                        }
+                        .buttonStyle(PlainButtonStyle())
                         Divider()
                         
                         NavigationLink(destination: SettingsView()) {

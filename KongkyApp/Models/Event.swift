@@ -25,6 +25,7 @@ struct Event: Identifiable, Codable {
     var maxCapacity: Int
     var joinedParticipants: Int = 0
     var imageURL: String?
+    var isSaved: Bool = false
     
     // How many of the main slots are taken (Will never exceed maxCapacity)
     var mainSlotsFilled: Int {

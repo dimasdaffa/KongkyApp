@@ -104,7 +104,7 @@ class HomeViewModel: ObservableObject {
         self.isLoading = true
         
         let event1 = Event(id: "dummy1", title: "Board Game DND", description: "The most unforgettable night you could have...", location: "Thamrin Nine Pantry", date: "Jun 16", time: "19:00 - 21:00", cost: 20000, organizerName: "Christoffer Wong", category: "Board Game", timeframe: "This Week", maxCapacity: 5, joinedParticipants: 8)
-        let event2 = Event(id: "dummy2", title: "Sunday Morning Futsal", description: "Let's sweat it out this weekend!", location: "Kuningan Arena", date: "Jun 18", time: "08:00 - 10:00", cost: 50000, organizerName: "Alex", category: "Sport", timeframe: "Next Week", maxCapacity: 10, joinedParticipants: 3)
+        let event2 = Event(id: "dummy2", title: "Sunday Morning Futsal", description: "Let's sweat it out this weekend!", location: "Kuningan Arena", date: "Jun 18", time: "08:00 - 10:00", cost: 50000, organizerName: "Alex", category: "Sport", timeframe: "Next Week", maxCapacity: 10, joinedParticipants: 3, isSaved: true)
         let event3 = Event(id: "dummy3", title: "Iftar Gathering", description: "Lunch together at the famous local spot.", location: "Sederhana Sudirman", date: "Jun 20", time: "16:00 - 19:00", cost: 35000, organizerName: "Dimas Daffa", category: "Share Meal", timeframe: "Completed", maxCapacity: 4, joinedParticipants: 4)
         
         // We delay it by 1 second just to let the skeleton animation show briefly
