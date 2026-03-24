@@ -1,0 +1,71 @@
+# ==========================================
+# Xcode / iOS
+# ==========================================
+
+# Build generated
+build/
+DerivedData/
+
+# Xcode user-specific files (your personal window layout, breakpoints, etc.)
+*.xcuserstate
+*.xcuserdatad
+xcuserdata/
+
+# Xcode workspace settings (can cause merge conflicts)
+*.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist
+
+# ==========================================
+# Swift Package Manager (SPM)
+# ==========================================
+
+# SPM builds
+.build/
+.swiftpm/
+
+# Resolved package versions (some teams commit this, but it's safe to ignore)
+# Package.resolved
+
+# ==========================================
+# CocoaPods (if you ever use it)
+# ==========================================
+Pods/
+
+# ==========================================
+# 🔥 Firebase / Secrets (IMPORTANT!)
+# ==========================================
+
+# This file contains your Firebase API keys, project ID, etc.
+# You should NEVER push this to a public repo!
+GoogleService-Info.plist
+
+# Any .env or secrets files
+.env
+.env.*
+*.secret
+
+# ==========================================
+# macOS System Files
+# ==========================================
+.DS_Store
+*.swp
+*~
+._*
+
+# ==========================================
+# Miscellaneous
+# ==========================================
+
+# Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+# Archives & IPA exports
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Fastlane (if you ever use it for deployment)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
