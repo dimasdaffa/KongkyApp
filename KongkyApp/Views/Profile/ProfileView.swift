@@ -40,9 +40,14 @@ struct ProfileView: View {
                         }
                         .buttonStyle(PlainButtonStyle())
                         Divider()
+                        
                         ProfileRow(icon: "heart.fill", title: "Saved Events")
                         Divider()
-                        ProfileRow(icon: "gearshape.fill", title: "Settings")
+                        
+                        NavigationLink(destination: SettingsView()) {
+                            ProfileRow(icon: "gearshape.fill", title: "Settings")
+                        }
+                        .buttonStyle(PlainButtonStyle())
                         Divider()
                         
                         ProfileRow(icon: "arrow.right.square.fill", title: "Log Out", isDestructive: true)
