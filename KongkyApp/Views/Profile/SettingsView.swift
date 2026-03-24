@@ -92,6 +92,19 @@ struct SettingsView: View {
                         .foregroundColor(.gray)
                         .disabled(true) // Usually disabled in standard settings
                 }
+                
+                NavigationLink(destination: EditInterestsView()) {
+                    HStack {
+                        Text("My Interests")
+                        Spacer()
+                        // Show a preview of their interests on the row itself!
+                        Text("Board Game, Sport")
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .frame(maxWidth: 120, alignment: .trailing)
+                    }
+                }
             }
             
             // 2. SECURITY SECTION
