@@ -61,7 +61,7 @@ struct ActivityDetailView: View {
         }
     }
     
-    // MARK: - Sub-Expressions (Refactored to keep compiler happy) 
+    // MARK: - Sub-Expressions 
     
     private var heroSection: some View {
         ZStack(alignment: .top) {
