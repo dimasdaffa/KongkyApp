@@ -9,104 +9,141 @@ import SwiftUI
 
 struct DashboardEventCard: View {
     let event: Event
-    
     @State private var isSaved: Bool = false
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(spacing: 0) { // Spacing 0 ensures the image touches the white card body perfectly
             
-            ZStack(alignment: .topTrailing) {
+            // 1. TOP IMAGE AREA
+            ZStack(alignment: .top) {
+                // Placeholder for your real images.
+                // We use a gray rectangle for now, but you will swap this with AsyncImage later!
                 Rectangle()
-                    .fill(Color(.systemGray5))
-                    .frame(height: 160)
-                    .cornerRadius(14)
+                    .fill(Color(.systemGray4))
+                    .frame(height: 180)
                 
-                // The Heart Button Overlay
-                Button(action: {
-                    isSaved.toggle()
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred() // Haptic tap!
-                }) {
-                    Image(systemName: isSaved ? "heart.fill" : "heart")
-                        .font(.title3)
-                        .foregroundColor(isSaved ? .red : .gray)
-                        .padding(10)
-                        .background(.ultraThinMaterial) // Frosted glass circle
-                        .clipShape(Circle())
-                }
-                .padding(12)
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                
-                HStack {
-                    Image(systemName: event.iconName)
-                        .font(.title2)
-                        .foregroundColor(.secondary)
-                    Text(event.title)
-                        .font(.title3)
-                        .fontWeight(.bold)
-                }
-                
-                Text(event.description)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-            }
-            .padding(.horizontal, 8)
-            
-            HStack {
-                // Cost
-                HStack(spacing: 4) {
-                    Image(systemName: "dollarsign.circle")
-                        .foregroundColor(.secondary)
-                    Text("\(event.cost/1000)k")
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                }
-                
-                // Date
-                HStack(spacing: 4) {
-                    Image(systemName: "calendar")
-                        .foregroundColor(.secondary)
-                    Text(event.date.replacingOccurrences(of: "\n", with: " "))
-                        .font(.footnote)
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-                
-                HStack(spacing: -8) {
-                    // 1. Calculate how many circles to draw (max 4)
-                    let displayCount = min(event.joinedParticipants, 4)
+                // Top Overlay elements (Category Pill & Heart)
+                HStack(alignment: .top) {
+                    // Category Pill
+                    HStack(spacing: 4) {
+                        Image(systemName: event.iconName)
+                            .foregroundColor(.themePrimary)
+                        Text(event.category.uppercased())
+                    }
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    // .thickMaterial gives that beautiful iOS frosted glass effect!
+                    .background(.thickMaterial)
+                    .cornerRadius(8)
                     
-                    if displayCount > 0 {
-                        ForEach(0..<displayCount, id: \.self) { index in
-                            Circle()
-                            // Added a fading opacity effect based on the index!
-                                .fill(Color.gray.opacity(0.8 - (Double(index) * 0.15)))
-                                .frame(width: 24, height: 24)
-                                .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
+                    Spacer()
+                    
+                    // Heart Button
+                    Button(action: {
+                        isSaved.toggle()
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    }) {
+                        Image(systemName: isSaved ? "heart.fill" : "heart")
+                            .font(.title3)
+                            .foregroundColor(isSaved ? .red : .white)
+                        // We add padding to ensure the touch target is large enough (HIG Standard: 44x44)
+                            .padding(8)
+                        //                            .background(Color.black.opacity(0.3)) // Subtle dark background so it's visible on white images
+                        //                            .clipShape(Circle())
+                    }
+                }
+                .padding(16)
+            }
+            
+            // 2. BOTTOM CONTENT AREA
+            VStack(alignment: .leading, spacing: 12) {
+                // Title
+                Text(event.title)
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.themeText) // Using your custom soft-black!
+                    .lineLimit(1)
+                
+                // Location
+                HStack(spacing: 4) {
+                    Image(systemName: "mappin.and.ellipse")
+                    Text(event.location)
+                }
+                .font(.subheadline)
+                .foregroundColor(.themeTextVariant)
+                
+                // Bottom Row: Price, Date, Avatars
+                HStack(alignment: .bottom) {
+                    // Price Area - Styled exactly like your design!
+                    HStack(alignment: .bottom, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("\(event.cost / 1000)k") // Formats 150000 to 150k
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themePrimary)
+                            Text("IDR")
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themePrimary)
+                        }
+                        Text("/ pax")
+                            .font(.caption)
+                            .foregroundColor(.themeTextVariant)
+                            .padding(.bottom, 2) // Aligns it visually with the IDR
+                    }
+                    
+                    Spacer()
+                    
+                    // Date
+                    HStack(spacing: 4) {
+                        Image(systemName: "calendar")
+                        Text(event.date.replacingOccurrences(of: "\n", with: " "))
+                    }
+                    .font(.caption)
+                    .foregroundColor(.themeTextVariant)
+                    
+                    Spacer()
+                    
+                    // Avatars (The "Halo" effect)
+                    HStack(spacing: -8) { // Negative spacing overlaps them
+                        let displayCount = min(event.joinedParticipants, 3) // Show max 3 circles
+                        
+                        if displayCount > 0 {
+                            ForEach(0..<displayCount, id: \.self) { index in
+                                Circle()
+                                    .fill(Color.gray.opacity(0.5))
+                                    .frame(width: 28, height: 28)
+                                // DESIGN.md implementation: The 2px halo using the card background color!
+                                    .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                            }
+                        }
+                        
+                        // Remaining count indicator
+                        if event.joinedParticipants > 3 {
+                            Text("+\(event.joinedParticipants - 3)")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themeTextVariant)
+                                .padding(.leading, 6)
                         }
                     }
                 }
-                
-                // 2. If there are more than 4, show the "+X" text!
-                if event.joinedParticipants > 4 {
-                    Text("+\(event.joinedParticipants - 4)")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.secondary)
-                        .padding(.leading, 2)
-                }
+                .padding(.top, 8)
             }
-            .padding(.horizontal, 8)
-            .padding(.bottom, 12)
+            .padding(16)
+            .background(Color.white) // Layer 2 from DESIGN.md
         }
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(14)
-        .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: 2)
+        .cornerRadius(20) // Soft, large corners
+        // DESIGN.md implementation: Ambient shadow with 32 blur, 8 Y-offset, 6% opacity
+        .shadow(color: Color.themeText.opacity(0.06), radius: 32, x: 0, y: 8)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 8)
         .onAppear {
-                    isSaved = event.isSaved
-                }
+            isSaved = event.isSaved
+        }
     }
 }
 
@@ -121,7 +158,7 @@ struct DashboardEventCard: View {
         organizerName: "Alex",
         category: "Board Game",
         maxCapacity: 5,
-        joinedParticipants: 9, // Should show 4 circles and "+5"
+        joinedParticipants: 9, // Should show 3 circles and "+6"
     ))
     .padding()
 }
