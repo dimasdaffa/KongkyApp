@@ -40,7 +40,7 @@ KongkyApp helps communities organize group activities — from board game nights
 | Backend      | Firebase (Firestore)      |
 | Auth         | Firebase Authentication   |
 | IDE          | Xcode                     |
-| Min Target   | iOS 17+                   |
+| Min Target   | iOS 26+                   |
 
 ## Architecture
 
