@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import CoreLocation
 //import FirebaseFirestoreSwift
 
 struct Event: Identifiable, Codable {
     var id: String = UUID().uuidString //need to change if firebase
-
+    
     
     var title: String
     var description: String
@@ -26,6 +27,18 @@ struct Event: Identifiable, Codable {
     var joinedParticipants: Int = 0
     var imageURL: String?
     var isSaved: Bool = false
+    var coordinate: CLLocationCoordinate2D {
+        if location.localizedCaseInsensitiveContains("Senopati") {
+            return CLLocationCoordinate2D(latitude: -6.2300, longitude: 106.8075)
+        } else if location.localizedCaseInsensitiveContains("Thamrin") {
+            return CLLocationCoordinate2D(latitude: -6.1965, longitude: 106.8226)
+        } else if location.localizedCaseInsensitiveContains("Kuningan") {
+            return CLLocationCoordinate2D(latitude: -6.2230, longitude: 106.8327)
+        } else {
+            // Default fallback: Central Jakarta
+            return CLLocationCoordinate2D(latitude: -6.2000, longitude: 106.8166)
+        }
+    }
     
     // How many of the main slots are taken (Will never exceed maxCapacity)
     var mainSlotsFilled: Int {
