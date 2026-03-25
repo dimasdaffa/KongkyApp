@@ -10,8 +10,10 @@ import SwiftUI
 struct ActivityDetailView: View {
     let event: Event
     
+    @State private var showCancelSheet = false
     @State private var isSaved = false
-    @State private var showJoinAlert = false
+    @State private var hasJoined = false
+    @State private var showToast = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -290,26 +292,49 @@ struct ActivityDetailView: View {
             // --- 6. STICKY JOIN BUTTON ---
             VStack {
                 Button(action: {
-                    showJoinAlert = true
-                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                    if !hasJoined {
+                        // THE JOIN ACTION
+                        UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                        
+                        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                            hasJoined = true
+                            showToast = true
+                        }
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                showToast = false
+                            }
+                        }
+                    } else {
+                        // THE CANCEL ACTION
+                        showCancelSheet = true
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    }
                 }) {
                     HStack {
-                        Image(systemName: "bolt.fill")
-                        Text("Join Activity")
+                        Image(systemName: hasJoined ? "checkmark.circle.fill" : "bolt.fill")
+                        Text(hasJoined ? "Seat Secured" : "Join Activity")
                     }
                     .font(.headline)
-                    .foregroundColor(.white)
+                    .foregroundColor(hasJoined ? .themeTextVariant : .white)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
                     .background(
-                        LinearGradient(
-                            colors: [.themePrimary, Color(red: 0, green: 112/255, blue: 235/255)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
+                        Group {
+                            if hasJoined {
+                                Color(.systemGray5)
+                            } else {
+                                LinearGradient(
+                                    colors: [.themePrimary, Color(red: 0, green: 112/255, blue: 235/255)],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            }
+                        }
                     )
                     .cornerRadius(30)
-                    .shadow(color: .themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                    .shadow(color: hasJoined ? .clear : .themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
                 }
                 .buttonStyle(SpringyButtonStyle())
             }
@@ -317,7 +342,56 @@ struct ActivityDetailView: View {
             .padding(.top, 16)
             .padding(.bottom, 20)
             .background(.ultraThinMaterial)
+            
+            .confirmationDialog(
+                "Are you sure you want to leave?",
+                isPresented: $showCancelSheet,
+                titleVisibility: .visible
+            ) {
+                Button("Leave Activity", role: .destructive) {
+                    // This is where the red button lives
+                    withAnimation(.spring()) {
+                        hasJoined = false
+                    }
+                }
+                // Apple automatically adds a bold "Cancel" button to dismiss the sheet
+                Button("Keep My Seat", role: .cancel) {}
+            } message: {
+                Text("You will give up your spot for \(event.title).")
+            }
+            
+            // --- 7. TOP GLASS TOAST NOTIFICATION ---
+            if showToast {
+                VStack {
+                    HStack(spacing: 12) {
+                        Image(systemName: "ticket.fill")
+                            .font(.title3)
+                            .foregroundColor(.themePrimary)
+                        
+                        Text("You're on the list! See you there.")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.themeText)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 14)
+                    .background(.ultraThinMaterial)
+                    .cornerRadius(30)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 30)
+                            .stroke(Color.white.opacity(0.5), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
+                    .padding(.top, 16) // Padding from the top of the screen
+                    
+                    Spacer() // Pushes the toast to the top
+                }
+                // Transition handles sliding down from the top and fading in smoothly
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(2) // Ensures it sits perfectly above the image and content
+            }
         }
+        
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -328,7 +402,6 @@ struct ActivityDetailView: View {
             
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    // Action for sharing
                 }) {
                     Image(systemName: "square.and.arrow.up")
                         .foregroundColor(.themeTextVariant)
