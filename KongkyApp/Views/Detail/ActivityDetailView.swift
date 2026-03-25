@@ -14,259 +14,330 @@ struct ActivityDetailView: View {
     @State private var showJoinAlert = false
     
     var body: some View {
-        // We use a ZStack and align the sticky button area to the BOTTOM
-        // so the main content can scroll UNDERNEATH it, creating a true glass effect.
         ZStack(alignment: .bottom) {
             
-            // 1. THE MAIN SCROLLABLE CONTENT
+            Color.themeSurface.ignoresSafeArea()
+            
             ScrollView {
-                VStack(alignment: .leading, spacing: 20) {
+                VStack(spacing: 16) {
                     
-                    // (Image placeholder section...)
-                    Rectangle()
-                        .fill(Color(.systemGray5))
-                        .frame(height: 250)
-                        .cornerRadius(14)
-                        .overlay(
-                            Image(systemName: "photo")
-                                .font(.largeTitle)
-                                .foregroundColor(.secondary)
-                        )
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: event.iconName).font(.title2)
-                            Text(event.title).font(.title2).fontWeight(.bold)
+                    // --- 1. HERO IMAGE WITH FADE, CATEGORY PILL & HEART ---
+                    ZStack(alignment: .top) {
+                        
+                        // Image Placeholder with the new Fading Gradient!
+                        ZStack {
+                            Rectangle()
+                                .fill(Color(.systemGray4))
+                            
+                            // This creates the seamless fade into the white card
+                            LinearGradient(
+                                colors: [.clear, .white.opacity(0.6), .white],
+                                startPoint: .center, // Starts fading halfway down
+                                endPoint: .bottom
+                            )
                         }
+                        .frame(height: 340) // Made slightly taller to accommodate the fade
                         
-                        Text(event.description).font(.body).foregroundColor(.secondary).lineSpacing(4)
-                    }
-                    .padding().frame(maxWidth: .infinity, alignment: .leading).background(Color(.secondarySystemBackground)).cornerRadius(14).shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
-                    
-                    HStack(spacing: 12) {
-                        Circle().fill(Color.gray.opacity(0.4)).frame(width: 50, height: 50).overlay(Image(systemName: "person.fill").foregroundColor(.white))
-                        
-                        VStack(alignment: .leading) {
-                            Text("Event by").font(.caption).foregroundColor(.secondary)
-                            Text(event.organizerName).font(.headline)
-                            Text(event.organizerSession)
-                                .font(.caption)
-                                .foregroundColor(.blue)
-                        }
-                        Spacer()
-                    }
-                    .padding().background(Color(.secondarySystemBackground)).cornerRadius(14).shadow(color: Color.primary.opacity(0.05), radius: 4, x: 0, y: 2)
-                    
-                // ---------------------------------------------------------
-                // 1. PARTICIPANTS VISUALIZER CARD (Now Clickable & Fixed!)
-                // ---------------------------------------------------------
-                NavigationLink(destination: ParticipantsListView(event: event)) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        
-                        // The Pill Header & Chevron
+                        // Top Overlay (Pill on left, Heart on right)
                         HStack {
-                            Label("Participants", systemImage: "person.2")
-                                .font(.subheadline)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color(.tertiarySystemFill))
-                                .cornerRadius(20)
-                                .foregroundColor(.primary)
+                            HStack(spacing: 6) {
+                                Image(systemName: event.iconName)
+                                    .foregroundColor(.themePrimary)
+                                    .font(.caption)
+                                Text(event.category.uppercased())
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                            }
+                            .foregroundColor(.themeText)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(Color.white)
+                            .cornerRadius(20)
                             
                             Spacer()
                             
-                            // Visual hint that this card is clickable
+                            Button(action: {
+                                isSaved.toggle()
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            }) {
+                                Image(systemName: isSaved ? "heart.fill" : "heart")
+                                    .font(.title3)
+                                    .foregroundColor(isSaved ? .red : .themeTextVariant)
+                                    .padding(10)
+                                //                                    .background(Color.white)
+                                //                                    .clipShape(Circle())
+                                //                                    .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
+                    }
+                    
+                    // --- 2. TITLE & DESCRIPTION CARD ---
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(event.title)
+                            .font(.system(size: 32, weight: .heavy, design: .default))
+                            .foregroundColor(.themeText)
+                            .padding(.bottom, 4)
+                        
+                        Text(event.description)
+                            .font(.body)
+                            .foregroundColor(.themeTextVariant)
+                            .lineSpacing(6)
+                    }
+                    .padding(24)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.white)
+                    .cornerRadius(30)
+                    .padding(.top, -60) // Pulled up a bit more to sit perfectly on the fade
+                    .padding(.horizontal, 16)
+                    .shadow(color: Color.themeText.opacity(0.04), radius: 20, x: 0, y: 4)
+                    
+                    // --- 3. ORGANIZER ROW ---
+                    HStack(spacing: 16) {
+                        Circle()
+                            .fill(Color(.systemGray4))
+                            .frame(width: 48, height: 48)
+                            .overlay(
+                                Image(systemName: "checkmark.circle.fill")
+                                    .foregroundColor(.blue)
+                                    .background(Circle().fill(Color.white))
+                                    .offset(x: 16, y: 16)
+                            )
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("ORGANIZER")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themeTextVariant)
+                                .tracking(1)
+                            
+                            Text(event.organizerName)
+                                .font(.headline)
+                                .foregroundColor(.themeText)
+                            
+                            Text(event.organizerSession)
+                                .font(.caption)
+                                .foregroundColor(.themePrimary)
+                        }
+                        Spacer()
+                    }
+                    .padding(16)
+                    .background(Color(.systemGray6).opacity(0.6))
+                    .cornerRadius(20)
+                    .padding(.horizontal, 16)
+                    
+                    // --- 4. CAPACITY ROW (NOW CLICKABLE!) ---
+                    NavigationLink(destination: ParticipantsListView(event: event)) {
+                        HStack {
+                            HStack(spacing: -12) {
+                                let displayCount = min(event.joinedParticipants, 3)
+                                ForEach(0..<displayCount, id: \.self) { _ in
+                                    Circle()
+                                        .fill(Color(.systemGray3))
+                                        .frame(width: 36, height: 36)
+                                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                                }
+                                
+                                // Fixed logic to show remaining participants accurately
+                                if event.joinedParticipants > 3 {
+                                    Circle()
+                                        .fill(Color(.systemGray5))
+                                        .frame(width: 36, height: 36)
+                                        .overlay(
+                                            Text("+\(event.joinedParticipants - 3)")
+                                                .font(.caption2)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.themeText)
+                                        )
+                                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                                }
+                            }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .trailing, spacing: 2) {
+                                Text("CAPACITY")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themeTextVariant)
+                                    .tracking(1)
+                                
+                                let seatsLeft = max(0, event.maxCapacity - event.mainSlotsFilled)
+                                Text("\(seatsLeft) more seats")
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themeText)
+                                
+                                
+                            }
+                            
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
                                 .font(.caption)
                         }
+                        .padding(16)
+                        .background(Color(.systemGray6).opacity(0.6))
+                        .cornerRadius(20)
+                        .padding(.horizontal, 16)
+                    }
+                    .buttonStyle(PlainButtonStyle()) // Crucial: Stops the text from turning default blue!
+                    
+                    // --- 5. THE BIG DETAILS CARD ---
+                    VStack(alignment: .leading, spacing: 24) {
                         
-                        HStack {
-                            // The Overlapping Circles (Limited to 4 circles max to prevent squishing)
-                            let displayCount = min(event.maxCapacity, 4)
-                            HStack(spacing: -12) { // Slightly tighter overlap
-                                ForEach(0..<displayCount, id: \.self) { index in
-                                    Circle()
-                                        .fill(index < event.mainSlotsFilled ? Color(.systemGray4) : Color(.systemBackground))
-                                        .frame(width: 38, height: 38) // Slightly smaller circles
-                                        .overlay(Circle().stroke(Color.gray.opacity(0.3), lineWidth: 1))
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("PRICING", systemImage: "banknote")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themePrimary)
+                                    .tracking(1)
+                                
+                                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                    Text("\(event.formatPrice(event.currentIndividualPrice))")
+                                        .font(.system(size: 32, weight: .bold))
+                                        .foregroundColor(.themePrimary)
+                                    Text("IDR / pax")
+                                        .font(.caption)
+                                        .foregroundColor(.themeTextVariant)
                                 }
                                 
-                                // If capacity is larger than 4, show a +X indicator
-                                if event.maxCapacity > 4 {
-                                    Circle()
-                                        .fill(Color(.tertiarySystemFill))
-                                        .frame(width: 38, height: 38)
-                                        .overlay(
-                                            Text("+\(event.maxCapacity - 4)")
-                                                .font(.caption2)
-                                                .foregroundColor(.secondary)
-                                        )
-                                }
-                            }
-                            
-                            Spacer(minLength: 12)
-                            
-                            // The Call to Action Text
-                            let availableSeats = event.maxCapacity - event.mainSlotsFilled
-                            if availableSeats > 0 {
-                                // Grouped in a VStack so it aligns nicely
-                                VStack(alignment: .trailing, spacing: 2) {
-                                    Text("\(availableSeats) more seats available,")
-                                        .foregroundColor(.secondary)
-                                        .font(.caption)
-                                    Text("book now!")
-                                        .foregroundColor(.secondary)
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                }
-                                // MAGIC FIX: Tells SwiftUI this text MUST have enough room!
-                                .layoutPriority(1) 
-                            } else {
-                                Text("Fully booked!")
-                                    .foregroundColor(.secondary)
+                                Text("Total: \(event.formatPrice(event.cost)) IDR")
                                     .font(.caption)
-                                    .fontWeight(.bold)
-                                    .layoutPriority(1)
-                            }
-                        }
-                    }
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(16)
-                }
-                .buttonStyle(PlainButtonStyle()) // Keeps text from turning blue like a standard link
-                
-                // ---------------------------------------------------------
-                // 2. PRICING & DETAILS CARD (Location restored!)
-                // ---------------------------------------------------------
-                VStack(alignment: .leading, spacing: 16) {
-                    
-                    Label("Details", systemImage: "square.grid.2x2")
-                        .font(.subheadline)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color(.tertiarySystemFill))
-                        .cornerRadius(20)
-                    
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Individual Price").font(.headline)
-                            if event.mainSlotsFilled < event.maxCapacity {
-                                HStack(spacing: 2) {
-                                    Text("Invite more to become \(event.formatPrice(event.nextIndividualPrice)) / pax")
-                                        .font(.caption).italic().foregroundColor(.secondary)
+                                    .foregroundColor(.themeText)
+                                
+                                HStack {
+                                    Text("Invite more to\nbecome \(event.formatPrice(event.nextIndividualPrice))/pax")
+                                        .font(.system(size: 10, weight: .semibold))
+                                        .lineLimit(2)
+                                    Spacer()
                                     Image(systemName: "arrow.down.right")
-                                        .font(.caption2).foregroundColor(.secondary)
+                                        .font(.caption2)
                                 }
+                                .foregroundColor(.themePrimary)
+                                .padding(8)
+                                .background(Color.themePrimary.opacity(0.1))
+                                .cornerRadius(8)
                             }
+                            
+                            Spacer()
+                            
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("WHEN", systemImage: "calendar")
+                                    .font(.caption2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themePrimary)
+                                    .tracking(1)
+                                
+                                Text(event.date)
+                                    .font(.subheadline)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themeText)
+                                
+                                Text("\(event.time) WIB")
+                                    .font(.caption)
+                                    .foregroundColor(.themeTextVariant)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 10)
                         }
-                        Spacer()
-                        Text("\(event.formatPrice(event.currentIndividualPrice)) IDR / pax")
-                            .foregroundColor(.secondary)
+                        
+                        Rectangle()
+                            .fill(Color.gray.opacity(0.15))
+                            .frame(height: 1)
+                        
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("WHERE", systemImage: "mappin.and.ellipse")
+                                .font(.caption2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themePrimary)
+                                .tracking(1)
+                            
+                            Text(event.location)
+                                .font(.subheadline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themeText)
+                            
+                            Text("Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan")
+                                .font(.caption)
+                                .foregroundColor(.themeTextVariant)
+                                .lineSpacing(4)
+                            
+                            ZStack {
+                                Rectangle()
+                                    .fill(Color(.systemTeal).opacity(0.3))
+                                    .frame(height: 120)
+                                    .cornerRadius(12)
+                                
+                                Image(systemName: "mappin.circle.fill")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(.yellow)
+                            }
+                            .padding(.top, 8)
+                        }
                     }
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("Total Price").font(.headline)
-                        Spacer()
-                        Text("\(event.formatPrice(event.cost)) IDR").foregroundColor(.secondary)
-                    }
-                    
-                    Divider()
-                    
-                    HStack {
-                        Text("Date").font(.headline)
-                        Spacer()
-                        Text(event.date).foregroundColor(.secondary)
-                    }
-                    
-                    Divider()
-                    
-                    // --- RESTORED LOCATION ROW ---
-                    HStack {
-                        Text("Location").font(.headline)
-                        Spacer()
-                        Text(event.location).foregroundColor(.secondary)
-                    }
-                }
-                .padding()
-                .background(Color(.secondarySystemBackground))
-                .cornerRadius(16)
+                    .padding(20)
+                    .background(Color.white)
+                    .cornerRadius(24)
+                    .padding(.horizontal, 16)
+                    .shadow(color: Color.themeText.opacity(0.04), radius: 20, x: 0, y: 4)
                     
                     Color.clear.frame(height: 100)
                 }
-                .padding()
             }
             
-            // 2. THE STICKY JOIN BUTTON AREA
+            // --- 6. STICKY JOIN BUTTON ---
             VStack {
                 Button(action: {
-                    // Action for joining activity
                     showJoinAlert = true
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                 }) {
-                    Text("Join Activity")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: [.green.opacity(0.9), .green.opacity(0.7)],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
+                    HStack {
+                        Image(systemName: "bolt.fill")
+                        Text("Join Activity")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    .background(
+                        LinearGradient(
+                            colors: [.themePrimary, Color(red: 0, green: 112/255, blue: 235/255)],
+                            startPoint: .top,
+                            endPoint: .bottom
                         )
-                    // A frosted glass material blur directly behind the gradient
-                        .background(.ultraThinMaterial)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .stroke(Color.white.opacity(0.2), lineWidth: 1.5)
-                        )
-                        .cornerRadius(14)
+                    )
+                    .cornerRadius(30)
+                    .shadow(color: .themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                }
+                .buttonStyle(SpringyButtonStyle())
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
+            .background(.ultraThinMaterial)
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text("Activity Detail")
+                    .font(.headline)
+                    .foregroundColor(.themePrimary)
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {
+                    // Action for sharing
+                }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundColor(.themeTextVariant)
                 }
             }
-            .padding()
-            .background(.thinMaterial) // Apple built-in frosted glass effect
-            .shadow(color: Color.primary.opacity(0.05), radius: 5, x: 0, y: -5)
         }
-        .navigationTitle("Activity Detail")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden, for: .tabBar) // Remove Tab Bar on Page
-        .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            isSaved.toggle()
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        }) {
-                            Image(systemName: isSaved ? "heart.fill" : "heart")
-                                .foregroundColor(isSaved ? .red : .secondary)
-                        }
-                    }
-                }
-                .onAppear {
-                    isSaved = event.isSaved
-                }
-        .alert(isPresented: $showJoinAlert) {
-            Alert(
-                title: Text("Success!"),
-                message: Text("You have successfully joined \(event.title)."),
-                dismissButton: .default(Text("Awesome"))
-            )
-        }
-    }
-}
-
-struct DetailRow: View {
-    let title: String
-    let value: String
-    var body: some View {
-        HStack {
-            Text(title).fontWeight(.semibold)
-            Spacer()
-            Text(value).foregroundColor(.secondary)
+        .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            isSaved = event.isSaved
         }
     }
 }
