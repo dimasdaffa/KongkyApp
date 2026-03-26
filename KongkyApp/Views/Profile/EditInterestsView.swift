@@ -14,7 +14,7 @@ struct EditInterestsView: View {
         ("Board Game", "dice.fill"),
         ("Tea Time", "cup.and.saucer.fill"),
         ("Sport", "basketball.fill"),
-        ("Watch Party", "clapperboard.fill"),
+        ("Watch Party", "popcorn.fill"),
         ("Share Meal", "fork.knife"),
         ("Music", "music.note")
     ]

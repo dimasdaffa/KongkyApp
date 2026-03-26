@@ -19,7 +19,7 @@ struct OnboardingInterestsView: View {
         InterestItem(name: "Board Game", icon: "dice.fill"),
         InterestItem(name: "Tea Time", icon: "cup.and.saucer.fill"),
         InterestItem(name: "Sport", icon: "basketball.fill"),
-        InterestItem(name: "Watch Party", icon: "clapperboard.fill"),
+        InterestItem(name: "Watch Party", icon: "popcorn.fill"),
         InterestItem(name: "Share Meal", icon: "fork.knife"),
         InterestItem(name: "Music", icon: "music.note")
     ]

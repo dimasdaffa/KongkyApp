@@ -13,6 +13,27 @@ struct DashboardView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var showCreateForm = false
     
+    // Computes the greeting strictly based on WIB time
+    private var dynamicGreeting: String {
+        var calendar = Calendar.current
+        
+        // Force the timezone to WIB (Asia/Jakarta)
+        if let wibTimeZone = TimeZone(identifier: "Asia/Jakarta") {
+            calendar.timeZone = wibTimeZone
+        }
+        
+        let hour = calendar.component(.hour, from: Date())
+        
+        switch hour {
+        case 0..<12:
+            return "Good Morning,"
+        case 12..<18:
+            return "Good Afternoon,"
+        default:
+            return "Good Evening,"
+        }
+    }
+    
     let categories = ["Recommended", "Movie", "Sports", "Board Game"]
     
     var body: some View {
@@ -44,7 +65,7 @@ struct DashboardView: View {
                         
                         // 2. GREETING
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Good Morning,")
+                            Text(dynamicGreeting)
                                 .font(.subheadline)
                                 .foregroundColor(.themeTextVariant)
                             Text("Dimas Daffa")

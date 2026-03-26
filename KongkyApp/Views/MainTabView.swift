@@ -36,7 +36,8 @@ struct MainTabView: View {
                 }
                 .tag(2)
         }
-        .fontDesign(.rounded) 
+        .fontDesign(.rounded)
+        .tint(.themePrimary)
     }
 }
 
