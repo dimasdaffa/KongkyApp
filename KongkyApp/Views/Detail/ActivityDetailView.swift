@@ -61,7 +61,7 @@ struct ActivityDetailView: View {
         }
     }
     
-    // MARK: - Sub-Expressions 
+    // MARK: - Sub-Expressions
     
     private var heroSection: some View {
         ZStack(alignment: .top) {
@@ -229,29 +229,35 @@ struct ActivityDetailView: View {
                         .tracking(1)
                     
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text("\(event.formatPrice(event.currentIndividualPrice))")
+                        Text(event.currentIndividualPrice == 0 ? "Free" : event.formatPrice(event.currentIndividualPrice))
                             .font(.system(size: 32, weight: .bold))
                             .foregroundColor(.themePrimary)
-                        Text("IDR / pax")
-                            .font(.caption)
-                            .foregroundColor(.themeTextVariant)
+                        
+                        if event.currentIndividualPrice > 0 {
+                            Text("IDR / pax")
+                                .font(.caption)
+                                .foregroundColor(.themeTextVariant)
+                        }
                     }
-                    Text("Total: \(event.formatPrice(event.cost)) IDR")
+                    
+                    Text("Total: \(event.cost == 0 ? "Free" : "\(event.formatPrice(event.cost)) IDR")")
                         .font(.caption)
                         .foregroundColor(.themeText)
                     
-                    HStack {
-                        Text("Invite more to\nbecome \(event.formatPrice(event.nextIndividualPrice))/pax")
-                            .font(.system(size: 10, weight: .semibold))
-                            .lineLimit(2)
-                        Spacer()
-                        Image(systemName: "arrow.down.right")
-                            .font(.caption2)
+                    if event.nextIndividualPrice > 0 && event.currentIndividualPrice > 0 {
+                        HStack {
+                            Text("Invite more to\nbecome \(event.formatPrice(event.nextIndividualPrice))/pax")
+                                .font(.system(size: 10, weight: .semibold))
+                                .lineLimit(2)
+                            Spacer()
+                            Image(systemName: "arrow.down.right")
+                                .font(.caption2)
+                        }
+                        .foregroundColor(.themePrimary)
+                        .padding(8)
+                        .background(Color.themePrimary.opacity(0.1))
+                        .cornerRadius(8)
                     }
-                    .foregroundColor(.themePrimary)
-                    .padding(8)
-                    .background(Color.themePrimary.opacity(0.1))
-                    .cornerRadius(8)
                 }
                 Spacer()
                 VStack(alignment: .leading, spacing: 8) {

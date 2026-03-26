@@ -79,21 +79,28 @@ struct DashboardEventCard: View {
                 HStack(alignment: .bottom) {
                     // Price Area - Styled exactly like your design!
                     HStack(alignment: .bottom, spacing: 4) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text("\(event.cost / 1000)k") // Formats 150000 to 150k
-                                .font(.title3)
-                                .fontWeight(.bold)
-                                .foregroundColor(.themePrimary)
-                            Text("IDR")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.themePrimary)
+                            if event.currentIndividualPrice == 0 {
+                                Text("Free")
+                                    .font(.title3)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themePrimary)
+                            } else {
+                                VStack(alignment: .leading, spacing: 0) {
+                                    Text(event.formatPrice(event.currentIndividualPrice))
+                                        .font(.title3)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.themePrimary)
+                                    Text("IDR")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.themePrimary)
+                                }
+                                Text("/ pax")
+                                    .font(.caption)
+                                    .foregroundColor(.themeTextVariant)
+                                    .padding(.bottom, 2)
+                            }
                         }
-                        Text("/ pax")
-                            .font(.caption)
-                            .foregroundColor(.themeTextVariant)
-                            .padding(.bottom, 2) // Aligns it visually with the IDR
-                    }
                     
                     Spacer()
                     

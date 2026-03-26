@@ -79,6 +79,7 @@ struct Event: Identifiable, Codable {
     
     // Helper to format 50000 into "50k" just like your design!
     func formatPrice(_ amount: Int) -> String {
+        if amount == 0 { return "Free" } 
         if amount >= 1000 {
             return "\(amount / 1000)k"
         }
