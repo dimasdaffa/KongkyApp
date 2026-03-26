@@ -25,6 +25,13 @@ struct RegisterView: View {
                     
                     // --- 1. HEADER ---
                     VStack(spacing: 8) {
+                        Image("KongkyLogo") // Add Asset project logo
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 64, height: 64)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 4)
+                        
                         Text("Create Account")
                             .font(.system(size: 32, weight: .heavy, design: .default))
                             .foregroundColor(.themeText)

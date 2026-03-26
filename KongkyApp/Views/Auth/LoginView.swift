@@ -24,7 +24,7 @@ struct LoginView: View {
                         
                         // --- 1. LOGO & HEADER ---
                         VStack(spacing: 16) {
-                            Image("Kongky") // Make sure this is in your Assets!
+                            Image("KongkyLogo") // Add Asset project logo
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 64, height: 64)
@@ -32,7 +32,7 @@ struct LoginView: View {
                                 .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 4)
                             
                             VStack(spacing: 8) {
-                                Text("Welcome Back")
+                                Text("Welcome")
                                     .font(.system(size: 32, weight: .heavy, design: .default))
                                     .foregroundColor(.themeText)
                                 
