@@ -19,21 +19,21 @@ struct EditEventView: View {
     @State private var title = ""
     @State private var description = ""
     @State private var locationText = ""
-    @State private var date = ""
-    @State private var time = ""
+    
+    @State private var selectedDate = Date()
+    @State private var selectedStartTime = Date()
+    @State private var selectedEndTime = Date().addingTimeInterval(3600)
+    
     @State private var cost = ""
     @State private var category = "Board Game"
     @State private var maxCapacity = ""
     
-    // Image Picker
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var previewImage: UIImage? = nil
     
-    // Map State
     @State private var mapPosition: MapCameraPosition = .automatic
     @State private var selectedCoordinate: CLLocationCoordinate2D? = nil
     
-    // NEW: Toast & Success State
     @State private var isUpdated = false
     @State private var showToast = false
     
@@ -42,7 +42,6 @@ struct EditEventView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                // Layer 0: Base Background
                 Color.themeSurface.ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
@@ -67,7 +66,6 @@ struct EditEventView: View {
                 
                 stickyUpdateButton
                 
-                // NEW: The Top Toast Notification
                 if showToast {
                     toastNotification
                 }
@@ -94,11 +92,37 @@ struct EditEventView: View {
                 title = event.title
                 description = event.description
                 locationText = event.location
-                date = event.date
-                time = event.time
                 cost = String(event.cost)
                 category = event.category
                 maxCapacity = String(event.maxCapacity)
+                
+                // Parsed Date
+                let df = DateFormatter()
+                df.dateFormat = "MMM dd"
+                if let parsedDate = df.date(from: event.date.replacingOccurrences(of: "\n", with: " ")) {
+                    let calendar = Calendar.current
+                    var comps = calendar.dateComponents([.month, .day], from: parsedDate)
+                    comps.year = calendar.component(.year, from: Date())
+                    if let finalDate = calendar.date(from: comps) {
+                        selectedDate = finalDate
+                    }
+                }
+                
+                // --- NEW: Parsing BOTH Start and End time from "19:00 - 21:00" ---
+                let tf = DateFormatter()
+                tf.dateFormat = "HH:mm"
+                let timeParts = event.time.components(separatedBy: " - ")
+                
+                if let startString = timeParts.first, let parsedStart = tf.date(from: String(startString)) {
+                    selectedStartTime = parsedStart
+                }
+                if timeParts.count > 1, let parsedEnd = tf.date(from: String(timeParts[1])) {
+                    selectedEndTime = parsedEnd
+                } else if let parsedStart = tf.date(from: String(timeParts.first ?? "")) {
+                    // Fallback just in case old data doesn't have an end time
+                    selectedEndTime = parsedStart.addingTimeInterval(3600)
+                }
+                // -----------------------------------------------------------------------
                 
                 selectedCoordinate = event.coordinate
                 mapPosition = .region(MKCoordinateRegion(
@@ -267,29 +291,62 @@ struct EditEventView: View {
                 )
             }
             
+            VStack(alignment: .leading, spacing: 8) {
+                Text("DATE")
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.themeTextVariant)
+                    .tracking(1)
+                
+                HStack {
+                    DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                        .labelsHidden()
+                        .accentColor(.themePrimary)
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.themePrimary.opacity(0.05))
+                .cornerRadius(16)
+            }
+            
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("DATE")
+                    Text("START TIME")
                         .font(.caption2)
                         .fontWeight(.bold)
                         .foregroundColor(.themeTextVariant)
                         .tracking(1)
-                    TextField("E.g. Jun 24", text: $date)
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
+                    
+                    HStack {
+                        DatePicker("", selection: $selectedStartTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .accentColor(.themePrimary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.themePrimary.opacity(0.05))
+                    .cornerRadius(16)
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("TIME")
+                    Text("END TIME")
                         .font(.caption2)
                         .fontWeight(.bold)
                         .foregroundColor(.themeTextVariant)
                         .tracking(1)
-                    TextField("E.g. 19:00", text: $time)
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
+                    
+                    HStack {
+                        DatePicker("", selection: $selectedEndTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .accentColor(.themePrimary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.themePrimary.opacity(0.05))
+                    .cornerRadius(16)
                 }
             }
             
@@ -302,6 +359,9 @@ struct EditEventView: View {
                         .tracking(1)
                     TextField("Max pax", text: $maxCapacity)
                         .keyboardType(.numberPad)
+                        .onChange(of: maxCapacity) { _, newValue in
+                            maxCapacity = newValue.filter { "0123456789".contains($0) }
+                        }
                         .padding(16)
                         .background(Color.themePrimary.opacity(0.05))
                         .cornerRadius(16)
@@ -315,6 +375,9 @@ struct EditEventView: View {
                         .tracking(1)
                     TextField("E.g. 50000", text: $cost)
                         .keyboardType(.numberPad)
+                        .onChange(of: cost) { _, newValue in
+                            cost = newValue.filter { "0123456789".contains($0) }
+                        }
                         .padding(16)
                         .background(Color.themePrimary.opacity(0.05))
                         .cornerRadius(16)
@@ -323,7 +386,6 @@ struct EditEventView: View {
         }
     }
     
-    // NEW: Dynamic Button State
     private var stickyUpdateButton: some View {
         VStack {
             Button(action: {
@@ -354,7 +416,6 @@ struct EditEventView: View {
         .background(.ultraThinMaterial)
     }
     
-    // NEW: The Toast View
     private var toastNotification: some View {
         VStack {
             HStack(spacing: 12) {
@@ -389,11 +450,21 @@ struct EditEventView: View {
     func updateEvent() {
         var updatedEvent = event
         
+        let df = DateFormatter()
+        df.dateFormat = "MMM dd"
+        let formattedDate = df.string(from: selectedDate)
+        
+        let tf = DateFormatter()
+        tf.dateFormat = "HH:mm"
+        let startString = tf.string(from: selectedStartTime)
+        let endString = tf.string(from: selectedEndTime)
+        let formattedTime = "\(startString) - \(endString)" // Formats correctly as "19:00 - 21:00"
+        
         updatedEvent.title = title.isEmpty ? "Untitled Event" : title
         updatedEvent.description = description
         updatedEvent.location = locationText
-        updatedEvent.date = date
-        updatedEvent.time = time
+        updatedEvent.date = formattedDate
+        updatedEvent.time = formattedTime
         updatedEvent.cost = Int(cost) ?? event.cost
         updatedEvent.category = category
         updatedEvent.maxCapacity = Int(maxCapacity) ?? event.maxCapacity
@@ -402,16 +473,13 @@ struct EditEventView: View {
             viewModel.events[index] = updatedEvent
         }
         
-        // Trigger vibration
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         
-        // Trigger animations
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
             isUpdated = true
             showToast = true
         }
         
-        // Wait 2 seconds, then dismiss
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             withAnimation(.easeInOut(duration: 0.3)) {
                 showToast = false

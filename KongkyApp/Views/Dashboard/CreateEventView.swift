@@ -17,17 +17,19 @@ struct CreateEventView: View {
     @State private var title = ""
     @State private var description = ""
     @State private var locationText = ""
-    @State private var date = ""
-    @State private var time = ""
+    
+    @State private var selectedDate = Date()
+    // NEW: Split into Start and End time
+    @State private var selectedStartTime = Date()
+    @State private var selectedEndTime = Date().addingTimeInterval(3600) // Defaults to 1 hour later
+    
     @State private var cost = ""
     @State private var category = "Board Game"
     @State private var maxCapacity = ""
     
-    // Image Picker
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var previewImage: UIImage? = nil
     
-    // Map State (Dummy initial center for Jakarta to act as a placeholder)
     @State private var mapPosition: MapCameraPosition = .region(MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: -6.2300, longitude: 106.8075),
         span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
@@ -37,22 +39,18 @@ struct CreateEventView: View {
     @State private var isCreated = false
     @State private var showToast = false
     
-    // Added "Other" to the categories!
     let categories = ["Board Game", "Tea Time", "Sport", "Watch Party", "Share Meal", "Other"]
     
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
-                // Layer 0: Base Background
                 Color.themeSurface.ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 24) {
                         
-                        // 1. Photo Upload (Dashed Border)
                         photoUploadSection
                         
-                        // 2. Main Form Card (No dividers, just spacing!)
                         VStack(alignment: .leading, spacing: 32) {
                             basicInfoSection
                             detailsSection
@@ -62,14 +60,14 @@ struct CreateEventView: View {
                         .cornerRadius(30)
                         .shadow(color: Color.themeText.opacity(0.04), radius: 20, x: 0, y: 4)
                         
-                        Color.clear.frame(height: 120) // Breathing room for the sticky button
+                        Color.clear.frame(height: 120)
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                 }
                 
-                // 3. Sticky Bottom Button
                 stickyCreateButton
+                
                 if showToast {
                     toastNotification
                 }
@@ -83,6 +81,14 @@ struct CreateEventView: View {
                     }
                     .foregroundColor(.red)
                 }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        hideKeyboard()
+                    }
+                    .fontWeight(.bold)
+                    .foregroundColor(.themePrimary)
+                }
             }
         }
     }
@@ -92,7 +98,6 @@ struct CreateEventView: View {
     private var photoUploadSection: some View {
         PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
             ZStack {
-                // Dashed border background
                 RoundedRectangle(cornerRadius: 24)
                     .strokeBorder(style: StrokeStyle(lineWidth: 2, dash: [8]), antialiased: true)
                     .foregroundColor(Color.gray.opacity(0.4))
@@ -136,7 +141,6 @@ struct CreateEventView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.themeText)
             
-            // Title Input
             VStack(alignment: .leading, spacing: 8) {
                 Text("ACTIVITY TITLE")
                     .font(.caption2)
@@ -146,12 +150,10 @@ struct CreateEventView: View {
                 
                 TextField("What are we doing?", text: $title)
                     .padding(16)
-                // The soft tinted background for inputs!
                     .background(Color.themePrimary.opacity(0.05))
                     .cornerRadius(16)
             }
             
-            // Category Selector (Horizontal scroll for pills)
             VStack(alignment: .leading, spacing: 12) {
                 Text("CATEGORY")
                     .font(.caption2)
@@ -181,7 +183,6 @@ struct CreateEventView: View {
                 }
             }
             
-            // Description Input (Multiline)
             VStack(alignment: .leading, spacing: 8) {
                 Text("DESCRIPTION")
                     .font(.caption2)
@@ -189,7 +190,6 @@ struct CreateEventView: View {
                     .foregroundColor(.themeTextVariant)
                     .tracking(1)
                 
-                // Using axis: .vertical allows the text field to grow automatically!
                 TextField("Tell everyone more about the vibe...", text: $description, axis: .vertical)
                     .lineLimit(4...8)
                     .padding(16)
@@ -207,7 +207,6 @@ struct CreateEventView: View {
                 .foregroundColor(.themeText)
                 .padding(.top, 8)
             
-            // Map / Location Picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("LOCATION NAME")
                     .font(.caption2)
@@ -215,7 +214,6 @@ struct CreateEventView: View {
                     .foregroundColor(.themeTextVariant)
                     .tracking(1)
                 
-                // 1. The user types the human-readable name here (e.g. "Thamrin Nine")
                 TextField("E.g. Agora Mall", text: $locationText)
                     .padding(16)
                     .background(Color.themePrimary.opacity(0.05))
@@ -228,35 +226,24 @@ struct CreateEventView: View {
                     .tracking(1)
                     .padding(.top, 8)
                 
-                // 2. The Interactive Map Picker
                 ZStack(alignment: .center) {
-                    
-                    // Notice we REMOVED .disabled(true) so the user can swipe around!
                     Map(position: $mapPosition)
-                        .frame(height: 180) // Made it slightly taller so it's easier to drag
+                        .frame(height: 180)
                         .cornerRadius(16)
-                    // HIG Feature: This listens to the user dragging the map
                         .onMapCameraChange(frequency: .onEnd) { context in
-                            // When they let go of the screen, we grab the exact center coordinate!
                             selectedCoordinate = context.region.center
-                            
-                            // Optional: Print to console so you can see it working!
-                            print("User dropped pin at: \(selectedCoordinate.latitude), \(selectedCoordinate.longitude)")
                         }
                     
-                    // 3. The Fixed Center Pin
-                    // Because this is in a ZStack, it always stays perfectly in the middle of the box while the map moves underneath it!
                     VStack(spacing: 0) {
                         Image(systemName: "mappin.circle.fill")
                             .font(.system(size: 32))
                             .foregroundColor(.themePrimary)
                         
-                        // A tiny shadow dot under the pin to make it look 3D (Digital Concierge vibe!)
                         Ellipse()
                             .fill(Color.black.opacity(0.2))
                             .frame(width: 12, height: 6)
                     }
-                    .offset(y: -16) // Lifts the pin up slightly so the "point" is in the exact center
+                    .offset(y: -16)
                 }
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
@@ -264,34 +251,68 @@ struct CreateEventView: View {
                 )
             }
             
-            // Date & Time Row (Split 50/50)
+            // --- NEW: FULL WIDTH DATE PICKER ---
+            VStack(alignment: .leading, spacing: 8) {
+                Text("DATE")
+                    .font(.caption2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.themeTextVariant)
+                    .tracking(1)
+                
+                HStack {
+                    DatePicker("", selection: $selectedDate, displayedComponents: .date)
+                        .labelsHidden()
+                        .accentColor(.themePrimary)
+                    Spacer()
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(Color.themePrimary.opacity(0.05))
+                .cornerRadius(16)
+            }
+            
+            // --- NEW: SPLIT TIME PICKERS ---
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("DATE")
+                    Text("START TIME")
                         .font(.caption2)
                         .fontWeight(.bold)
                         .foregroundColor(.themeTextVariant)
                         .tracking(1)
-                    TextField("E.g. Jun 24", text: $date)
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
+                    
+                    HStack {
+                        DatePicker("", selection: $selectedStartTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .accentColor(.themePrimary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.themePrimary.opacity(0.05))
+                    .cornerRadius(16)
                 }
                 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("TIME")
+                    Text("END TIME")
                         .font(.caption2)
                         .fontWeight(.bold)
                         .foregroundColor(.themeTextVariant)
                         .tracking(1)
-                    TextField("E.g. 19:00", text: $time)
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
+                    
+                    HStack {
+                        DatePicker("", selection: $selectedEndTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .accentColor(.themePrimary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.themePrimary.opacity(0.05))
+                    .cornerRadius(16)
                 }
             }
             
-            // Capacity & Cost Row
+            // --- UPDATED: STRICT NUMBER FILTERING ---
             HStack(spacing: 16) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("CAPACITY")
@@ -301,6 +322,10 @@ struct CreateEventView: View {
                         .tracking(1)
                     TextField("Max pax", text: $maxCapacity)
                         .keyboardType(.numberPad)
+                        // Filters out letters
+                        .onChange(of: maxCapacity) { _, newValue in
+                            maxCapacity = newValue.filter { "0123456789".contains($0) }
+                        }
                         .padding(16)
                         .background(Color.themePrimary.opacity(0.05))
                         .cornerRadius(16)
@@ -314,6 +339,10 @@ struct CreateEventView: View {
                         .tracking(1)
                     TextField("E.g. 50000", text: $cost)
                         .keyboardType(.numberPad)
+                        // Filters out letters
+                        .onChange(of: cost) { _, newValue in
+                            cost = newValue.filter { "0123456789".contains($0) }
+                        }
                         .padding(16)
                         .background(Color.themePrimary.opacity(0.05))
                         .cornerRadius(16)
@@ -325,13 +354,11 @@ struct CreateEventView: View {
     private var stickyCreateButton: some View {
         VStack {
             Button(action: {
-                // Prevent double-tapping while the success animation is playing
                 if !isCreated {
                     saveEvent()
                 }
             }) {
                 HStack {
-                    // Show a checkmark when successfully created
                     if isCreated {
                         Image(systemName: "checkmark.circle.fill")
                     }
@@ -341,10 +368,8 @@ struct CreateEventView: View {
                 .foregroundColor(isCreated ? .themeTextVariant : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                // Swap from Primary Blue to Soft Gray on success
                 .background(isCreated ? Color(.systemGray5) : Color.themePrimary)
                 .cornerRadius(30)
-                // Remove the shadow so it looks pressed into the screen
                 .shadow(color: isCreated ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
             }
             .buttonStyle(SpringyButtonStyle())
@@ -379,7 +404,7 @@ struct CreateEventView: View {
             .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
             .padding(.top, 16)
             
-            Spacer() // Pushes the toast to the top
+            Spacer()
         }
         .transition(.move(edge: .top).combined(with: .opacity))
         .zIndex(2)
@@ -391,12 +416,22 @@ struct CreateEventView: View {
         let costInt = Int(cost) ?? 0
         let capacityInt = Int(maxCapacity) ?? 5
         
+        let df = DateFormatter()
+        df.dateFormat = "MMM dd"
+        let formattedDate = df.string(from: selectedDate)
+        
+        let tf = DateFormatter()
+        tf.dateFormat = "HH:mm"
+        let startString = tf.string(from: selectedStartTime)
+        let endString = tf.string(from: selectedEndTime)
+        let formattedTime = "\(startString) - \(endString)" // Creates "19:00 - 21:00"
+        
         let newEvent = Event(
             title: title.isEmpty ? "Untitled Event" : title,
             description: description,
             location: locationText,
-            date: date,
-            time: time,
+            date: formattedDate,
+            time: formattedTime,
             cost: costInt,
             organizerName: "Alex Morgan",
             category: category,
@@ -406,28 +441,25 @@ struct CreateEventView: View {
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         
-        // Add it to your data
         viewModel.events.insert(newEvent, at: 0)
         
-        // Animate the button changing and the toast dropping down
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
             isCreated = true
             showToast = true
         }
         
-        // Wait 2 seconds so the user can enjoy the success state, THEN close the modal!
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             withAnimation(.easeInOut(duration: 0.3)) {
-                showToast = false // Slide the toast back up
+                showToast = false
             }
             
-            // Add a tiny micro-delay after the toast disappears before closing the whole page
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 presentationMode.wrappedValue.dismiss()
             }
         }
     }
 }
+
 #Preview {
     CreateEventView(viewModel: HomeViewModel())
 }

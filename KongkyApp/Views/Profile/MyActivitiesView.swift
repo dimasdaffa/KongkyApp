@@ -13,7 +13,7 @@ struct MyActivitiesView: View {
     @State private var selectedTab = "Joined"
     let tabs = ["Joined", "Hosted"]
     
-    // Modal States 
+    // Modal States
     @State private var eventToEdit: Event?
     @State private var showCreateForm = false
     
@@ -300,7 +300,7 @@ struct MyActivitiesView: View {
     }
 }
 
-// MARK: - Custom Activity Card
+// MARK: - Custom Activity Card 
 struct ActivityRowCard: View {
     let event: Event
     let isHosted: Bool
