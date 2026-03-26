@@ -7,7 +7,12 @@
 
 import SwiftUI
 
+enum AuthField {
+    case fullName, email, password
+}
+
 struct LoginView: View {
+    @FocusState private var focusedField: AuthField?
     @Binding var isAuthenticated: Bool
     
     @State private var email = ""
@@ -61,6 +66,10 @@ struct LoginView: View {
                                         .keyboardType(.emailAddress)
                                         .autocapitalization(.none)
                                         .disableAutocorrection(true)
+                                    // Keyboard Focus Logic
+                                        .focused($focusedField, equals: .email)
+                                        .submitLabel(.next)
+                                        .onSubmit { focusedField = .password }
                                 }
                                 .padding(16)
                                 .background(Color(.systemGray6).opacity(0.6))
@@ -74,7 +83,19 @@ struct LoginView: View {
                                     .fontWeight(.bold)
                                     .foregroundColor(.themeTextVariant)
                                 
-                                AuthPasswordToggleField(placeholder: "••••••••", text: $password)
+                                // NEW: Passing focus state down
+                                AuthPasswordToggleField(
+                                    placeholder: "••••••••",
+                                    text: $password,
+                                    focusedField: $focusedField,
+                                    fieldType: .password,
+                                    submitAction: {
+                                        if !email.isEmpty && !password.isEmpty {
+                                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                            withAnimation { isAuthenticated = true }
+                                        }
+                                    }
+                                )
                             }
                             
                             // Forgot Password Link
@@ -184,6 +205,10 @@ struct LoginView: View {
 struct AuthPasswordToggleField: View {
     var placeholder: String
     @Binding var text: String
+    var focusedField: FocusState<AuthField?>.Binding
+    var fieldType: AuthField
+    var submitAction: () -> Void
+    
     @State private var isVisible: Bool = false
     
     var body: some View {
@@ -196,15 +221,19 @@ struct AuthPasswordToggleField: View {
                 TextField(placeholder, text: $text)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
+                    .focused(focusedField, equals: fieldType)
+                    .submitLabel(.go)
+                    .onSubmit(submitAction)
             } else {
                 SecureField(placeholder, text: $text)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
+                    .focused(focusedField, equals: fieldType)
+                    .submitLabel(.go)
+                    .onSubmit(submitAction)
             }
             
-            Button(action: {
-                isVisible.toggle()
-            }) {
+            Button(action: { isVisible.toggle() }) {
                 Image(systemName: isVisible ? "eye.slash.fill" : "eye.fill")
                     .foregroundColor(.themeTextVariant)
             }

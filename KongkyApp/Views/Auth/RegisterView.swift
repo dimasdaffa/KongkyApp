@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct RegisterView: View {
+    @FocusState private var focusedField: AuthField?
     @Environment(\.presentationMode) var presentationMode
     @Binding var isAuthenticated: Bool
     
@@ -31,7 +32,6 @@ struct RegisterView: View {
                             .frame(width: 64, height: 64)
                             .clipShape(RoundedRectangle(cornerRadius: 16))
                             .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 4)
-                        
                         Text("Create Account")
                             .font(.system(size: 32, weight: .heavy, design: .default))
                             .foregroundColor(.themeText)
@@ -53,6 +53,9 @@ struct RegisterView: View {
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundColor(.themeTextVariant)
+                                .focused($focusedField, equals: .fullName)
+                                .submitLabel(.next)
+                                .onSubmit { focusedField = .email }
                             
                             HStack {
                                 Image(systemName: "person")
@@ -71,6 +74,9 @@ struct RegisterView: View {
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundColor(.themeTextVariant)
+                                .focused($focusedField, equals: .email)
+                                .submitLabel(.next)
+                                .onSubmit { focusedField = .password }
                             
                             HStack {
                                 Image(systemName: "envelope")
@@ -93,7 +99,18 @@ struct RegisterView: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(.themeTextVariant)
                             
-                            AuthPasswordToggleField(placeholder: "Min. 8 characters", text: $password)
+                            AuthPasswordToggleField(
+                                placeholder: "Min. 8 characters",
+                                text: $password,
+                                focusedField: $focusedField,
+                                fieldType: .password,
+                                submitAction: {
+                                    if !email.isEmpty && !password.isEmpty && !fullName.isEmpty {
+                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                        withAnimation { isAuthenticated = true }
+                                    }
+                                }
+                            )
                         }
                         
                         // Sign Up Button
