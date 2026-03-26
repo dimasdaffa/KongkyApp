@@ -80,12 +80,12 @@ struct LoginView: View {
                             // Forgot Password Link
                             HStack {
                                 Spacer()
-                                Button("Forgot Password?") {
-                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                NavigationLink(destination: ForgotPasswordView()) {
+                                    Text("Forgot Password?")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.themePrimary)
                                 }
-                                .font(.caption)
-                                .fontWeight(.bold)
-                                .foregroundColor(.themePrimary)
                             }
                             .padding(.top, -8)
                             
