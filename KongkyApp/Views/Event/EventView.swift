@@ -20,17 +20,17 @@ struct EventView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         
                         // --- 1. HEADER ---
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("All Events")
-                                .font(.system(size: 34, weight: .heavy, design: .default))
-                                .foregroundColor(.themeText)
-                            Text("Your upcoming social schedule")
-                                .font(.subheadline)
-                                .foregroundColor(.themeTextVariant)
-                        }
-                        .padding(.horizontal, 20)
-                        .padding(.top, 10)
-                        .padding(.bottom, 24)
+//                        VStack(alignment: .leading, spacing: 4) {
+//                            Text("All Events")
+//                                .font(.system(size: 34, weight: .heavy, design: .default))
+//                                .foregroundColor(.themeText)
+//                            Text("Your upcoming social schedule")
+//                                .font(.subheadline)
+//                                .foregroundColor(.themeTextVariant)
+//                        }
+//                        .padding(.horizontal, 20)
+//                        .padding(.top, 10)
+//                        .padding(.bottom, 24)
                         
                         // --- 2. THE TIMELINE CONTENT ---
                         if viewModel.isLoading {
@@ -63,7 +63,8 @@ struct EventView: View {
                     }
                 }
             }
-            .navigationBarHidden(true) // We built our own custom header!
+            .navigationTitle("All Events")
+            .navigationBarTitleDisplayMode(.large)
         }
     }
 }

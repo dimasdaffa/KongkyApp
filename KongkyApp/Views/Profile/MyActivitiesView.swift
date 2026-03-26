@@ -84,7 +84,7 @@ struct MyActivitiesView: View {
             }
         }
         .navigationTitle("My Activities")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar(.hidden, for: .tabBar)
         .sheet(item: $eventToEdit) { selectedEvent in
             EditEventView(viewModel: viewModel, event: selectedEvent)

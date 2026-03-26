@@ -47,7 +47,7 @@ struct DashboardView: View {
                             Text("Good Morning,")
                                 .font(.subheadline)
                                 .foregroundColor(.themeTextVariant)
-                            Text("Alex Morgan")
+                            Text("Dimas Daffa")
                                 .font(.largeTitle)
                                 .fontWeight(.heavy)
                                 .foregroundColor(.themeText)
