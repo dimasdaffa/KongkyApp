@@ -9,11 +9,11 @@ import SwiftUI
 import FirebaseCore
 
 class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-    return true
-  }
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        return true
+    }
 }
 
 @main
@@ -29,16 +29,19 @@ struct KongkyApp: App {
     var body: some Scene {
         WindowGroup {
             // The ultimate routing logic!
-            if !splashFinished {
-                // Show Splash first
-                SplashView(isActive: $splashFinished)
-            } else if !isAuthenticated {
-                // If splash is done but they aren't logged in, show Auth!
-                LoginView(isAuthenticated: $isAuthenticated)
-            } else {
-                // If they are logged in, send them into the app!
-                OnboardingInterestsView()
+            Group {
+                if !splashFinished {
+                    // Show Splash first
+                    SplashView(isActive: $splashFinished)
+                } else if !isAuthenticated {
+                    // If splash is done but they aren't logged in, show Auth!
+                    LoginView(isAuthenticated: $isAuthenticated)
+                } else {
+                    // If they are logged in, send them into the app!
+                    OnboardingInterestsView()
+                }
             }
+            .preferredColorScheme(.light)
         }
     }
 }
