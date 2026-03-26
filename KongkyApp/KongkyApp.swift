@@ -38,7 +38,7 @@ struct KongkyApp: App {
                     LoginView(isAuthenticated: $isAuthenticated)
                 } else {
                     // If they are logged in, send them into the app!
-                    OnboardingInterestsView()
+                    OnboardingInterestsView(isAuthenticated: $isAuthenticated)
                 }
             }
             .preferredColorScheme(.light)

@@ -9,6 +9,8 @@ import SwiftUI
 
 struct SavedEventsView: View {
     @StateObject private var viewModel = HomeViewModel()
+    @Binding var selectedTab: Int
+    @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ZStack {
@@ -91,6 +93,23 @@ struct SavedEventsView: View {
                 .foregroundColor(.themeTextVariant)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
+            
+            // NEW ACTIONABLE BUTTON
+            Button(action: {
+                selectedTab = 0 // Switch to Home Tab
+                presentationMode.wrappedValue.dismiss() // Close the Saved Events page
+            }) {
+                Text("Explore Activities")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 14)
+                    .background(Color.themePrimary)
+                    .cornerRadius(24)
+                    .shadow(color: Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+            }
+            .buttonStyle(SpringyButtonStyle())
+            .padding(.top, 12)
         }
         .padding(.top, 80)
     }
@@ -98,6 +117,6 @@ struct SavedEventsView: View {
 
 #Preview {
     NavigationView {
-        SavedEventsView()
+        SavedEventsView(selectedTab: .constant(0))
     }
 }

@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct ProfileView: View {
+    @Binding var isAuthenticated: Bool
+    @Binding var selectedTab: Int
+    @State private var showLogoutAlert = false
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -33,6 +37,18 @@ struct ProfileView: View {
             }
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.large)
+            .alert("Log Out", isPresented: $showLogoutAlert) {
+                            Button("Cancel", role: .cancel) { }
+                            Button("Log Out", role: .destructive) {
+                                // This actually logs the user out!
+                                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                                withAnimation {
+                                    isAuthenticated = false
+                                }
+                            }
+                        } message: {
+                            Text("Are you sure you want to log out of your account?")
+                        }
         }
     }
     
@@ -52,12 +68,6 @@ struct ProfileView: View {
                     )
                     .shadow(color: Color.themePrimary.opacity(0.15), radius: 20, x: 0, y: 10)
                 
-                // Verified / Pro Badge
-//                Image(systemName: "checkmark.seal.fill")
-//                    .font(.title2)
-//                    .foregroundColor(.themePrimary)
-//                    .background(Circle().fill(Color.white))
-//                    .offset(x: -4, y: -4)
             }
             
             VStack(spacing: 4) {
@@ -130,7 +140,7 @@ struct ProfileView: View {
                 .frame(height: 1)
                 .padding(.horizontal, 20)
             
-            NavigationLink(destination: SavedEventsView()) {
+            NavigationLink(destination: SavedEventsView(selectedTab: $selectedTab)) {
                 ProfileMenuRow(icon: "heart.fill", title: "Saved Events")
             }
             .buttonStyle(PlainButtonStyle())
@@ -153,36 +163,36 @@ struct ProfileView: View {
     }
     
     private var logoutSection: some View {
-        Button(action: {
-            // Trigger logout logic
-            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-        }) {
-            HStack(spacing: 16) {
-                ZStack {
-                    Circle()
-                        .fill(Color.red.opacity(0.1))
-                        .frame(width: 40, height: 40)
+            Button(action: {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                showLogoutAlert = true
+            }) {
+                HStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(Color.red.opacity(0.1))
+                            .frame(width: 40, height: 40)
+                        
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.red)
+                    }
                     
-                    Image(systemName: "rectangle.portrait.and.arrow.right")
-                        .font(.system(size: 16, weight: .bold))
+                    Text("Log Out")
+                        .font(.headline)
                         .foregroundColor(.red)
+                    
+                    Spacer()
                 }
-                
-                Text("Log Out")
-                    .font(.headline)
-                    .foregroundColor(.red)
-                
-                Spacer()
+                .padding(.vertical, 8)
+                .padding(.horizontal, 20)
+                .background(Color.white)
+                .cornerRadius(20)
+                .shadow(color: Color.themeText.opacity(0.04), radius: 20, x: 0, y: 4)
             }
-            .padding(.vertical, 8)
+            .buttonStyle(SpringyButtonStyle())
             .padding(.horizontal, 20)
-            .background(Color.white)
-            .cornerRadius(20)
-            .shadow(color: Color.themeText.opacity(0.04), radius: 20, x: 0, y: 4)
         }
-        .buttonStyle(SpringyButtonStyle()) // Using our custom spring bounce!
-        .padding(.horizontal, 20)
-    }
 }
 
 // MARK: - Reusable Row Component
@@ -222,5 +232,5 @@ struct ProfileMenuRow: View {
 }
 
 #Preview {
-    ProfileView()
+    ProfileView(isAuthenticated: .constant(true), selectedTab: .constant(0))
 }

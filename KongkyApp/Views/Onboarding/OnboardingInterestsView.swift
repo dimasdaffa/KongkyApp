@@ -14,6 +14,7 @@ struct InterestItem: Hashable {
 }
 
 struct OnboardingInterestsView: View {
+    @Binding var isAuthenticated: Bool
     // Mapping categories to SF Symbols matching the design
     let allCategories: [InterestItem] = [
         InterestItem(name: "Board Game", icon: "dice.fill"),
@@ -161,11 +162,11 @@ struct OnboardingInterestsView: View {
             )
         }
         .fullScreenCover(isPresented: $navigateToHome) {
-            MainTabView()
+            MainTabView(isAuthenticated: $isAuthenticated)
         }
     }
 }
     
     #Preview {
-        OnboardingInterestsView() 
+        OnboardingInterestsView(isAuthenticated: .constant(true)) 
     }

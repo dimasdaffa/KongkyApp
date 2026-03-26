@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MainTabView: View {
+    @Binding var isAuthenticated: Bool
     @State private var selectedTab = 0 // Create tab landing and set the initial value
     
     var body: some View {
@@ -29,7 +30,7 @@ struct MainTabView: View {
                 .tag(1)
             
             
-            ProfileView()
+            ProfileView(isAuthenticated: $isAuthenticated, selectedTab: $selectedTab)
                 .tabItem {
                     Image(systemName: "person.fill")
                     Text("Profile")
@@ -42,5 +43,5 @@ struct MainTabView: View {
 }
 
 #Preview {
-    MainTabView()
+    MainTabView(isAuthenticated: .constant(true))
 }
