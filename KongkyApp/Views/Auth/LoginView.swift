@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct LoginView: View {
-    // This tells the main app to move to the next screen
     @Binding var isAuthenticated: Bool
     
     @State private var email = ""
@@ -16,117 +15,203 @@ struct LoginView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 30) {
+            ZStack {
+                // Layer 0 Background
+                Color.themeSurface.ignoresSafeArea()
                 
-                Spacer()
-                
-                // --- HEADER ---
-                VStack(spacing: 12) {
-                    // Your Ghost Logo Placeholder
-                    ZStack {
-                        Circle().fill(Color.primary).frame(width: 80, height: 80)
-                        Text("K").font(.system(size: 40, weight: .bold)).foregroundColor(Color(.systemBackground))
-                    }
-                    
-                    Text("Welcome Back")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                    
-                    Text("Sign in to discover your next activity.")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-                
-                // --- EMAIL & PASSWORD FORM ---
-                VStack(spacing: 16) {
-                    TextField("Email", text: $email)
-                        .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(14)
-                        .keyboardType(.emailAddress)
-                        .autocapitalization(.none)
-                    
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(14)
-                }
-                .padding(.horizontal)
-                
-                // --- MAIN LOGIN BUTTON ---
-                Button(action: {
-                    // TODO: Add Firebase Auth login here later!
-                    
-                    // For now, just skip to the app!
-                    withAnimation {
-                        isAuthenticated = true
-                    }
-                }) {
-                    Text("Log In")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(Color.blue)
-                        .cornerRadius(14)
-                }
-                .padding(.horizontal)
-                
-                // --- OR DIVIDER ---
-                HStack {
-                    VStack { Divider() }
-                    Text("or continue with").font(.footnote).foregroundColor(.secondary).padding(.horizontal, 8)
-                    VStack { Divider() }
-                }
-                .padding(.horizontal, 30)
-                
-                // --- SOCIAL LOGIN BUTTONS ---
-                VStack(spacing: 16) {
-                    // Apple Button
-                    Button(action: { print("Apple Login Clicked") }) {
-                        HStack {
-                            Image(systemName: "applelogo").font(.title3)
-                            Text("Continue with Apple").fontWeight(.semibold)
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 32) {
+                        
+                        // --- 1. LOGO & HEADER ---
+                        VStack(spacing: 16) {
+                            Image("Kongky") // Make sure this is in your Assets!
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 64, height: 64)
+                                .clipShape(RoundedRectangle(cornerRadius: 16))
+                                .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 4)
+                            
+                            VStack(spacing: 8) {
+                                Text("Welcome Back")
+                                    .font(.system(size: 32, weight: .heavy, design: .default))
+                                    .foregroundColor(.themeText)
+                                
+                                Text("Sign in to discover your next activity.")
+                                    .font(.subheadline)
+                                    .foregroundColor(.themeTextVariant)
+                            }
                         }
-                        .foregroundColor(Color(.systemBackground))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color.primary)
-                        .cornerRadius(14)
-                    }
-                    
-                    // Google Button (Standard UI styling for Google)
-                    Button(action: { print("Google Login Clicked") }) {
-                        HStack {
-                            // Using a standard "G" since SF Symbols doesn't have a Google logo
-                            Text("G").font(.title3).fontWeight(.black)
-                            Text("Continue with Google").fontWeight(.semibold)
+                        .padding(.top, 40)
+                        
+                        // --- 2. MAIN FORM CARD ---
+                        VStack(spacing: 24) {
+                            
+                            // Email Field
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Email")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themeTextVariant)
+                                
+                                HStack {
+                                    Image(systemName: "envelope")
+                                        .foregroundColor(.themeTextVariant)
+                                        .frame(width: 20)
+                                    TextField("alex@example.com", text: $email)
+                                        .keyboardType(.emailAddress)
+                                        .autocapitalization(.none)
+                                        .disableAutocorrection(true)
+                                }
+                                .padding(16)
+                                .background(Color(.systemGray6).opacity(0.6))
+                                .cornerRadius(16)
+                            }
+                            
+                            // Password Field
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Password")
+                                    .font(.caption)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themeTextVariant)
+                                
+                                AuthPasswordToggleField(placeholder: "••••••••", text: $password)
+                            }
+                            
+                            // Forgot Password Link
+                            HStack {
+                                Spacer()
+                                Button("Forgot Password?") {
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                }
+                                .font(.caption)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themePrimary)
+                            }
+                            .padding(.top, -8)
+                            
+                            // Login Button
+                            Button(action: {
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                withAnimation {
+                                    isAuthenticated = true
+                                }
+                            }) {
+                                HStack {
+                                    Text("Log In")
+                                    Image(systemName: "arrow.right")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(email.isEmpty || password.isEmpty ? Color.gray.opacity(0.5) : Color.themePrimary)
+                                .cornerRadius(30)
+                                .shadow(color: email.isEmpty || password.isEmpty ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                            }
+                            .buttonStyle(SpringyButtonStyle())
+                            .disabled(email.isEmpty || password.isEmpty)
+                            
+                            // OR CONTINUE WITH Divider
+                            HStack(spacing: 16) {
+                                Rectangle().fill(Color(.systemGray5)).frame(height: 1)
+                                Text("OR CONTINUE WITH")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.themeTextVariant)
+                                    .tracking(1)
+                                Rectangle().fill(Color(.systemGray5)).frame(height: 1)
+                            }
+                            .padding(.vertical, 8)
+                            
+                            // Social Login Buttons
+                            HStack(spacing: 16) {
+                                Button(action: { UIImpactFeedbackGenerator(style: .light).impactOccurred() }) {
+                                    HStack {
+                                        Text("G").font(.headline).fontWeight(.black)
+                                        Text("Google").font(.subheadline).fontWeight(.semibold)
+                                    }
+                                    .foregroundColor(.themeText)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(Color.white)
+                                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(.systemGray5), lineWidth: 1))
+                                }
+                                .buttonStyle(SpringyButtonStyle())
+                                
+                                Button(action: { UIImpactFeedbackGenerator(style: .light).impactOccurred() }) {
+                                    HStack {
+                                        Image(systemName: "applelogo").font(.headline)
+                                        Text("Apple").font(.subheadline).fontWeight(.semibold)
+                                    }
+                                    .foregroundColor(.themeText)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(Color.white)
+                                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color(.systemGray5), lineWidth: 1))
+                                }
+                                .buttonStyle(SpringyButtonStyle())
+                            }
                         }
-                        .foregroundColor(.primary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 14)
-                        .background(Color(.secondarySystemBackground))
-                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.gray.opacity(0.2), lineWidth: 1))
+                        .padding(32)
+                        .background(Color.white)
+                        .cornerRadius(32)
+                        .shadow(color: Color.themeText.opacity(0.04), radius: 20, x: 0, y: 4)
+                        
+                        Spacer()
+                        
+                        // --- 3. SIGN UP LINK ---
+                        NavigationLink(destination: RegisterView(isAuthenticated: $isAuthenticated)) {
+                            HStack(spacing: 4) {
+                                Text("Don't have an account?")
+                                    .foregroundColor(.themeTextVariant)
+                                Text("Sign Up")
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themePrimary)
+                            }
+                            .font(.subheadline)
+                        }
+                        .padding(.bottom, 40)
                     }
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal)
-                
-                Spacer()
-                
-                // --- SIGN UP LINK ---
-                NavigationLink(destination: RegisterView(isAuthenticated: $isAuthenticated)) {
-                    HStack(spacing: 4) {
-                        Text("Don't have an account?")
-                            .foregroundColor(.secondary)
-                        Text("Sign Up")
-                            .fontWeight(.bold)
-                            .foregroundColor(.blue)
-                    }
-                    .font(.subheadline)
-                }
-                .padding(.bottom, 20)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .navigationBarHidden(true)
+        }
+    }
+}
+
+// MARK: - Reusable Custom Auth Password Field
+struct AuthPasswordToggleField: View {
+    var placeholder: String
+    @Binding var text: String
+    @State private var isVisible: Bool = false
+    
+    var body: some View {
+        HStack {
+            Image(systemName: "lock")
+                .foregroundColor(.themeTextVariant)
+                .frame(width: 20)
+            
+            if isVisible {
+                TextField(placeholder, text: $text)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+            } else {
+                SecureField(placeholder, text: $text)
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+            }
+            
+            Button(action: {
+                isVisible.toggle()
+            }) {
+                Image(systemName: isVisible ? "eye.slash.fill" : "eye.fill")
+                    .foregroundColor(.themeTextVariant)
             }
         }
+        .padding(16)
+        .background(Color(.systemGray6).opacity(0.6))
+        .cornerRadius(16)
     }
 }
 
