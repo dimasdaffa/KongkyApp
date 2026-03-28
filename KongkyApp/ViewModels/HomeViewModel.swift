@@ -7,94 +7,81 @@
 
 import Foundation
 import Combine
-//import FirebaseFirestore
-//import FirebaseFirestoreSwift
+import FirebaseFirestore
 
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
     @Published var isLoading: Bool = true
     
     // 1. Initialize the Firebase Database
-    // private var db = Firestore.firestore()
+    private var db = Firestore.firestore()
     
     init() {
         // Load dummy data immediately so the screen isn't empty
-        loadDummyData()
+        //        loadDummyData()
         
         // Then try to fetch the real data from the cloud!
-        // fetchEvents()
+        fetchEvents()
     }
     
     // ---------------------------------------------------------
     // READ (Real-time Listener)
     // ---------------------------------------------------------
     func fetchEvents() {
-        /*
-        // This listens to the "activities" table in Firestore
+        //         This listens to the "activities" table in Firestore
         db.collection("activities").addSnapshotListener { (querySnapshot, error) in
-            // Turn off the loading skeleton
             self.isLoading = false
             
             guard let documents = querySnapshot?.documents else {
                 print("No documents or offline: \(String(describing: error))")
-                return // If it fails (like no internet), the dummy data stays on screen!
+                return
             }
             
             // Convert Firebase JSON into our Swift Event structs
-            let fetchedEvents = documents.compactMap { document -> Event? in
+            self.events = documents.compactMap { document -> Event? in
                 try? document.data(as: Event.self)
             }
-            
-            // If we actually have data in Firebase, replace the dummy data!
-            if !fetchedEvents.isEmpty {
-                self.events = fetchedEvents
-            }
         }
-        */
+        
     }
     
     // ---------------------------------------------------------
     // CREATE
     // ---------------------------------------------------------
     func addEvent(event: Event) {
-        /*
         do {
             // This automatically converts the Swift struct to JSON and saves it!
             let _ = try db.collection("activities").addDocument(from: event)
         } catch {
             print("Error adding event to Firebase: \(error)")
         }
-        */
+        
     }
     
     // ---------------------------------------------------------
     // UPDATE
     // ---------------------------------------------------------
     func updateEvent(event: Event) {
-        /*
-        let documentId = event.id
+        guard let documentId = event.id else { return }
         
         do {
             try db.collection("activities").document(documentId).setData(from: event)
         } catch {
             print("Error updating event in Firebase: \(error)")
         }
-        */
     }
     
     // ---------------------------------------------------------
     // DELETE
     // ---------------------------------------------------------
     func deleteEvent(event: Event) {
-        /*
-        let documentId = event.id
+        guard let documentId = event.id else { return }
         
         db.collection("activities").document(documentId).delete { error in
             if let error = error {
                 print("Error removing document: \(error)")
             }
         }
-        */
     }
     
     // ---------------------------------------------------------

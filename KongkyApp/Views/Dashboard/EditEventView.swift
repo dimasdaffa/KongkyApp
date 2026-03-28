@@ -469,9 +469,11 @@ struct EditEventView: View {
         updatedEvent.category = category
         updatedEvent.maxCapacity = Int(maxCapacity) ?? event.maxCapacity
         
-        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
-            viewModel.events[index] = updatedEvent
-        }
+//        Dummy
+//        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
+//            viewModel.events[index] = updatedEvent
+//        }
+        viewModel.updateEvent(event: updatedEvent)
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         

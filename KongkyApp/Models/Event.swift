@@ -7,12 +7,13 @@
 
 import Foundation
 import CoreLocation
-//import FirebaseFirestoreSwift
+import FirebaseFirestore
 
 struct Event: Identifiable, Codable {
-    var id: String = UUID().uuidString //need to change if firebase
+    @DocumentID var id: String?
     
-    
+//    var id: String = UUID().uuidString //need to change if firebase
+
     var title: String
     var description: String
     var location: String

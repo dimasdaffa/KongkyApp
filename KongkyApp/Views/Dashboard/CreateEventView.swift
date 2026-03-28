@@ -441,7 +441,8 @@ struct CreateEventView: View {
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         
-        viewModel.events.insert(newEvent, at: 0)
+       /* viewModel.events.insert(newEvent, at: 0)*/ // Dummy
+        viewModel.addEvent(event: newEvent)
         
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
             isCreated = true
