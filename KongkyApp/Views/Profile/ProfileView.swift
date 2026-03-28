@@ -71,7 +71,7 @@ struct ProfileView: View {
             }
             
             VStack(spacing: 4) {
-                Text("Alex Morgan")
+                Text("Dimas Daffa")
                     .font(.system(size: 28, weight: .heavy, design: .rounded))
                     .foregroundColor(.themeText)
                 

@@ -42,8 +42,8 @@ struct MyActivitiesView: View {
                     VStack(spacing: 16) {
                         
                         let filteredEvents = selectedTab == "Hosted"
-                            ? viewModel.events.filter { $0.organizerName == "Alex" }
-                            : viewModel.events.filter { $0.organizerName != "Alex" }
+                            ? viewModel.events.filter { $0.organizerName == "Dimas Daffa" } // Updated to match your creation default!
+                            : viewModel.events.filter { $0.organizerName != "Dimas Daffa" }
                         
                         if filteredEvents.isEmpty {
                             emptyState
@@ -261,29 +261,28 @@ struct MyActivitiesView: View {
     // MARK: - Actions
     
     func confirmLeave(event: Event) {
-        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
-            withAnimation {
-                viewModel.events.remove(at: index)
-            }
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            
-            toastMessage = "You have left the activity."
-            showToastSequence()
+        // FIREBASE FIX: Rather than deleting the event, we reduce the participant count
+        // and tell Firebase to update it.
+        var updatedEvent = event
+        if updatedEvent.joinedParticipants > 0 {
+            updatedEvent.joinedParticipants -= 1
         }
+        viewModel.updateEvent(event: updatedEvent)
+        
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        toastMessage = "You have left the activity."
+        showToastSequence()
         eventToLeave = nil
     }
     
-    // NEW: Action for deleting
     func confirmDelete(event: Event) {
-        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
-            withAnimation {
-                viewModel.events.remove(at: index)
-            }
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            
-            toastMessage = "Activity permanently deleted."
-            showToastSequence()
-        }
+        // FIREBASE FIX: Ask the viewModel to delete this document from Firestore!
+        // The SnapshotListener will automatically remove it from the screen.
+        viewModel.deleteEvent(event: event)
+        
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        toastMessage = "Activity permanently deleted."
+        showToastSequence()
         eventToDelete = nil
     }
     
@@ -300,7 +299,7 @@ struct MyActivitiesView: View {
     }
 }
 
-// MARK: - Custom Activity Card 
+// MARK: - Custom Activity Card
 struct ActivityRowCard: View {
     let event: Event
     let isHosted: Bool

@@ -39,6 +39,15 @@ struct CreateEventView: View {
     @State private var isCreated = false
     @State private var showToast = false
     
+    // Validation Check
+    private var isFormValid: Bool {
+            !title.trimmingCharacters(in: .whitespaces).isEmpty &&
+            !description.trimmingCharacters(in: .whitespaces).isEmpty &&
+            !locationText.trimmingCharacters(in: .whitespaces).isEmpty &&
+            !cost.isEmpty &&
+            !maxCapacity.isEmpty
+        }
+    
     let categories = ["Board Game", "Tea Time", "Sport", "Watch Party", "Share Meal", "Other"]
     
     var body: some View {
@@ -352,34 +361,36 @@ struct CreateEventView: View {
     }
     
     private var stickyCreateButton: some View {
-        VStack {
-            Button(action: {
-                if !isCreated {
-                    saveEvent()
-                }
-            }) {
-                HStack {
-                    if isCreated {
-                        Image(systemName: "checkmark.circle.fill")
+            VStack {
+                Button(action: {
+                    if isFormValid && !isCreated {
+                        saveEvent()
                     }
-                    Text(isCreated ? "Activity Created" : "Create Activity")
+                }) {
+                    HStack {
+                        if isCreated {
+                            Image(systemName: "checkmark.circle.fill")
+                        }
+                        Text(isCreated ? "Activity Created" : "Create Activity")
+                    }
+                    .font(.headline)
+                    .foregroundColor(isCreated ? .themeTextVariant : .white)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 16)
+                    // Use gray if invalid, success color if created, or primary blue if ready
+                    .background(!isFormValid ? Color.gray.opacity(0.5) : (isCreated ? Color(.systemGray5) : Color.themePrimary))
+                    .cornerRadius(30)
+                    .shadow(color: (!isFormValid || isCreated) ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
                 }
-                .font(.headline)
-                .foregroundColor(isCreated ? .themeTextVariant : .white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .background(isCreated ? Color(.systemGray5) : Color.themePrimary)
-                .cornerRadius(30)
-                .shadow(color: isCreated ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                .buttonStyle(SpringyButtonStyle())
+                // Lock the button until form is valid
+                .disabled(!isFormValid || isCreated)
             }
-            .buttonStyle(SpringyButtonStyle())
-            .disabled(isCreated)
+            .padding(.horizontal, 20)
+            .padding(.top, 16)
+            .padding(.bottom, 20)
+            .background(.ultraThinMaterial)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 16)
-        .padding(.bottom, 20)
-        .background(.ultraThinMaterial)
-    }
     
     private var toastNotification: some View {
         VStack {
@@ -426,6 +437,7 @@ struct CreateEventView: View {
         let endString = tf.string(from: selectedEndTime)
         let formattedTime = "\(startString) - \(endString)" // Creates "19:00 - 21:00"
         
+        // Default data created
         let newEvent = Event(
             title: title.isEmpty ? "Untitled Event" : title,
             description: description,
@@ -433,7 +445,7 @@ struct CreateEventView: View {
             date: formattedDate,
             time: formattedTime,
             cost: costInt,
-            organizerName: "Alex Morgan",
+            organizerName: "Dimas Daffa",
             category: category,
             maxCapacity: capacityInt,
             joinedParticipants: 1

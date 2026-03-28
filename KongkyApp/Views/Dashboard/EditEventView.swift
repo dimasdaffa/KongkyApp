@@ -37,6 +37,15 @@ struct EditEventView: View {
     @State private var isUpdated = false
     @State private var showToast = false
     
+    // Validation Check
+    private var isFormValid: Bool {
+        !title.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !description.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !locationText.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !cost.isEmpty &&
+        !maxCapacity.isEmpty
+    }
+    
     let categories = ["Board Game", "Tea Time", "Sport", "Watch Party", "Share Meal", "Other"]
     
     var body: some View {
@@ -389,7 +398,7 @@ struct EditEventView: View {
     private var stickyUpdateButton: some View {
         VStack {
             Button(action: {
-                if !isUpdated {
+                if isFormValid && !isUpdated {
                     updateEvent()
                 }
             }) {
@@ -403,12 +412,12 @@ struct EditEventView: View {
                 .foregroundColor(isUpdated ? .themeTextVariant : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(isUpdated ? Color(.systemGray5) : Color.themePrimary)
+                .background(!isFormValid ? Color.gray.opacity(0.5) : (isUpdated ? Color(.systemGray5) : Color.themePrimary))
                 .cornerRadius(30)
-                .shadow(color: isUpdated ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                .shadow(color: (!isFormValid || isUpdated) ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
             }
             .buttonStyle(SpringyButtonStyle())
-            .disabled(isUpdated)
+            .disabled(!isFormValid || isUpdated)
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -469,10 +478,10 @@ struct EditEventView: View {
         updatedEvent.category = category
         updatedEvent.maxCapacity = Int(maxCapacity) ?? event.maxCapacity
         
-//        Dummy
-//        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
-//            viewModel.events[index] = updatedEvent
-//        }
+        //        Dummy
+        //        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
+        //            viewModel.events[index] = updatedEvent
+        //        }
         viewModel.updateEvent(event: updatedEvent)
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)

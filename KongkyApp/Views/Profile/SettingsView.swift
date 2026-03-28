@@ -9,9 +9,9 @@ import SwiftUI
 import PhotosUI
 
 struct SettingsView: View {
-    @State private var username = "Alex Morgan"
-    @State private var session = "Morning"
-    @State private var email = "alex.morgan@example.com"
+    @State private var username = "Dimas Daffa"
+    @State private var session = "Afternoon"
+    @State private var email = "alex@example.com"
     
     @State private var currentPassword = ""
     @State private var newPassword = ""
