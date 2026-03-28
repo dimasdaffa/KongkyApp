@@ -68,10 +68,7 @@ struct MyActivitiesView: View {
                                 )
                             }
                         }
-                        
-                        if selectedTab == "Hosted" || !filteredEvents.isEmpty {
                             ctaSection
-                        }
                         
                         Color.clear.frame(height: 40)
                     }
@@ -167,7 +164,7 @@ struct MyActivitiesView: View {
                 Circle()
                     .fill(Color.themePrimary.opacity(0.1))
                     .frame(width: 80, height: 80)
-                Image(systemName: selectedTab == "Hosted" ? "sparkles.rectangle" : "ticket")
+                Image(systemName: selectedTab == "Hosted" ? "calendar.badge.plus" : "ticket")
                     .font(.system(size: 32))
                     .foregroundColor(.themePrimary)
             }
