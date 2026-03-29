@@ -149,7 +149,7 @@ struct DashboardEventCard: View {
         .padding(.horizontal, 20)
         .padding(.vertical, 8)
         .onAppear {
-            isSaved = event.isSaved
+            isSaved = event.isSavedBy(email: "")
         }
     }
 }
@@ -165,7 +165,7 @@ struct DashboardEventCard: View {
         organizerName: "Alex",
         category: "Board Game",
         maxCapacity: 5,
-        joinedParticipants: 9, // Should show 3 circles and "+6"
+        participantEmails: Array(repeating: "user@test.com", count: 9) // Should show 3 circles and "+6"
     ))
     .padding()
 }

@@ -7,14 +7,24 @@
 
 import SwiftUI
 import MapKit
+import FirebaseAuth
 
 struct ActivityDetailView: View {
-    let event: Event
+    var event: Event
     
     @State private var showCancelSheet = false
     @State private var isSaved = false
-    @State private var hasJoined = false
     @State private var showToast = false
+    // Connect to Firebase
+    @StateObject private var viewModel = HomeViewModel()
+    
+    var currentUserEmail: String {
+        Auth.auth().currentUser?.email ?? ""
+    }
+    
+    var isJoined: Bool {
+        event.isJoinedBy(email: currentUserEmail)
+    }
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -57,7 +67,8 @@ struct ActivityDetailView: View {
         }
         .toolbar(.hidden, for: .tabBar)
         .onAppear {
-            isSaved = event.isSaved
+            // Load correct save state on open
+            isSaved = event.isSavedBy(email: currentUserEmail)
         }
     }
     
@@ -93,9 +104,15 @@ struct ActivityDetailView: View {
                 
                 Spacer()
                 
+                // DYNAMIC SAVE BUTTON
                 Button(action: {
-                    isSaved.toggle()
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    // Instantly toggle UI
+                    isSaved.toggle()
+                    // Update Firebase
+                    var updatedEvent = event
+                    updatedEvent.toggleSaved(for: currentUserEmail)
+                    viewModel.updateEvent(event: updatedEvent)
                 }) {
                     Image(systemName: isSaved ? "heart.fill" : "heart")
                         .font(.title3)
@@ -326,11 +343,17 @@ struct ActivityDetailView: View {
     
     private var stickyJoinButton: some View {
         VStack {
+            // DYNAMIC JOIN BUTTON
             Button(action: {
-                if !hasJoined {
+                if !isJoined {
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                    
+                    // Tell Firebase to add the user
+                    var updatedEvent = event
+                    updatedEvent.toggleJoin(for: currentUserEmail)
+                    viewModel.updateEvent(event: updatedEvent)
+                    
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                        hasJoined = true
                         showToast = true
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
@@ -339,21 +362,22 @@ struct ActivityDetailView: View {
                         }
                     }
                 } else {
+                    // They already joined, show the leave prompt
                     showCancelSheet = true
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 }
             }) {
                 HStack {
-                    Image(systemName: hasJoined ? "checkmark.circle.fill" : "bolt.fill")
-                    Text(hasJoined ? "Seat Secured" : "Join Activity")
+                    Image(systemName: isJoined ? "checkmark.circle.fill" : "bolt.fill")
+                    Text(isJoined ? "Seat Secured" : "Join Activity")
                 }
                 .font(.headline)
-                .foregroundColor(hasJoined ? .themeTextVariant : .white)
+                .foregroundColor(isJoined ? .themeTextVariant : .white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
                 .background(
                     Group {
-                        if hasJoined {
+                        if isJoined {
                             Color(.systemGray5)
                         } else {
                             LinearGradient(
@@ -365,7 +389,7 @@ struct ActivityDetailView: View {
                     }
                 )
                 .cornerRadius(30)
-                .shadow(color: hasJoined ? .clear : .themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                .shadow(color: isJoined ? .clear : .themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
             }
             .buttonStyle(SpringyButtonStyle())
             
@@ -377,7 +401,10 @@ struct ActivityDetailView: View {
             ) {
                 Button("Leave Activity", role: .destructive) {
                     withAnimation(.spring()) {
-                        hasJoined = false
+                        // Tell Firebase to remove the user
+                        var updatedEvent = event
+                        updatedEvent.toggleJoin(for: currentUserEmail)
+                        viewModel.updateEvent(event: updatedEvent)
                     }
                 }
                 Button("Keep My Seat", role: .cancel) {}
@@ -433,7 +460,7 @@ struct ActivityDetailView: View {
             organizerName: "Dimas Daffa",
             category: "Share Meal",
             maxCapacity: 5,
-            joinedParticipants: 8
+            participantEmails: Array(repeating: "test@example.com", count: 8) // Simulating 8 participants
         ))
     }
 }

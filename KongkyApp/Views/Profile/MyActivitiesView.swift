@@ -46,7 +46,7 @@ struct MyActivitiesView: View {
                         
                         let filteredEvents = selectedTab == "Hosted"
                         ? viewModel.events.filter { $0.organizerEmail == currentUserEmail }
-                        : viewModel.events.filter { $0.organizerEmail != currentUserEmail }
+                        : viewModel.events.filter { $0.isJoinedBy(email: currentUserEmail) && $0.organizerEmail != currentUserEmail }
                         
                         if filteredEvents.isEmpty {
                             emptyState
@@ -261,12 +261,9 @@ struct MyActivitiesView: View {
     // MARK: - Actions
     
     func confirmLeave(event: Event) {
-        // FIREBASE FIX: Rather than deleting the event, we reduce the participant count
-        // and tell Firebase to update it.
+        let currentUserEmail = Auth.auth().currentUser?.email ?? ""
         var updatedEvent = event
-        if updatedEvent.joinedParticipants > 0 {
-            updatedEvent.joinedParticipants -= 1
-        }
+        updatedEvent.toggleJoin(for: currentUserEmail)
         viewModel.updateEvent(event: updatedEvent)
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)

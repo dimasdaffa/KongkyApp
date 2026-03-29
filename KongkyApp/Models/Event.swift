@@ -24,9 +24,13 @@ struct Event: Identifiable, Codable {
     var category: String
     var timeframe: String = "This Week"
     var maxCapacity: Int
-    var joinedParticipants: Int = 0
     var imageURL: String?
-    var isSaved: Bool = false
+    var participantEmails: [String] = []
+    
+    var joinedParticipants: Int {
+        return participantEmails.count
+    }
+    
     var coordinate: CLLocationCoordinate2D {
         if location.localizedCaseInsensitiveContains("Senopati") {
             return CLLocationCoordinate2D(latitude: -6.2300, longitude: 106.8075)
@@ -77,7 +81,7 @@ struct Event: Identifiable, Codable {
         return cost / max(1, nextSlots)
     }
     
-    // Helper to format 50000 into "50k" 
+    // Helper to format 50000 into "50k"
     func formatPrice(_ amount: Int) -> String {
         if amount == 0 { return "Free" }
         if amount >= 1000 {
@@ -86,6 +90,7 @@ struct Event: Identifiable, Codable {
         return "\(amount)"
     }
     
+    // MARK: - Save Logic
     mutating func toggleSaved(for email: String) {
         if savedBy == nil { savedBy = [] }
         if savedBy!.contains(email) {
@@ -97,5 +102,18 @@ struct Event: Identifiable, Codable {
     
     func isSavedBy(email: String) -> Bool {
         return savedBy?.contains(email) ?? false
+    }
+    
+    // MARK: - Join Logic
+    mutating func toggleJoin(for email: String) {
+        if participantEmails.contains(email) {
+            participantEmails.removeAll { $0 == email } // Leave
+        } else {
+            participantEmails.append(email) // Join
+        }
+    }
+    
+    func isJoinedBy(email: String) -> Bool {
+        return participantEmails.contains(email)
     }
 }

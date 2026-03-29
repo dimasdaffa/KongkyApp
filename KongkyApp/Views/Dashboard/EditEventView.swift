@@ -516,7 +516,7 @@ struct EditEventView: View {
             organizerName: "Christoffer Wong",
             category: "Board Game",
             maxCapacity: 5,
-            joinedParticipants: 8
+            participantEmails: Array(repeating: "user@test.com", count: 8)
         )
     )
 }

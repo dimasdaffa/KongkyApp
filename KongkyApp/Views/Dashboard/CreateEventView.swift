@@ -438,7 +438,7 @@ struct CreateEventView: View {
         let endString = tf.string(from: selectedEndTime)
         let formattedTime = "\(startString) - \(endString)" // Creates "19:00 - 21:00"
         
-        // Default data created
+        let currentUserEmail = Auth.auth().currentUser?.email ?? ""
         let newEvent = Event(
             title: title.isEmpty ? "Untitled Event" : title,
             description: description,
@@ -450,7 +450,7 @@ struct CreateEventView: View {
             organizerEmail: Auth.auth().currentUser?.email ?? "",
             category: category,
             maxCapacity: capacityInt,
-            joinedParticipants: 1
+            participantEmails: [currentUserEmail]
         )
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
