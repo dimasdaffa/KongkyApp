@@ -10,6 +10,7 @@
 		388928242F6712DD00AD4939 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 388928232F6712DD00AD4939 /* FirebaseFirestore */; };
 		388928262F6712DD00AD4939 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 388928252F6712DD00AD4939 /* FirebaseStorage */; };
 		388928292F67132F00AD4939 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 388928282F67132F00AD4939 /* SDWebImageSwiftUI */; };
+		38BC37442F77C6B5006A33EA /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 38BC37432F77C6B5006A33EA /* FirebaseAuth */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 				388928292F67132F00AD4939 /* SDWebImageSwiftUI in Frameworks */,
 				388928242F6712DD00AD4939 /* FirebaseFirestore in Frameworks */,
 				388928262F6712DD00AD4939 /* FirebaseStorage in Frameworks */,
+				38BC37442F77C6B5006A33EA /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,6 +87,7 @@
 				388928232F6712DD00AD4939 /* FirebaseFirestore */,
 				388928252F6712DD00AD4939 /* FirebaseStorage */,
 				388928282F67132F00AD4939 /* SDWebImageSwiftUI */,
+				38BC37432F77C6B5006A33EA /* FirebaseAuth */,
 			);
 			productName = KongkyApp;
 			productReference = 383FE3022F652BE50002059B /* KongkyApp.app */;
@@ -391,6 +394,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 388928272F67132F00AD4939 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
 			productName = SDWebImageSwiftUI;
+		};
+		38BC37432F77C6B5006A33EA /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 38D1AEC12F670BB000DE83B5 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

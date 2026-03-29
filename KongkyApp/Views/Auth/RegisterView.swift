@@ -12,21 +12,22 @@ struct RegisterView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var isAuthenticated: Bool
     
+    // Connect the ViewModel
+    @StateObject private var authViewModel = AuthViewModel()
+    
     @State private var fullName = ""
     @State private var email = ""
     @State private var password = ""
     
     var body: some View {
         ZStack {
-            // Layer 0 Background
             Color.themeSurface.ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 32) {
                     
-                    // --- 1. HEADER ---
                     VStack(spacing: 8) {
-                        Image("KongkyLogo") // Add Asset project logo
+                        Image("KongkyLogo")
                             .resizable()
                             .scaledToFill()
                             .frame(width: 64, height: 64)
@@ -44,39 +45,33 @@ struct RegisterView: View {
                     }
                     .padding(.top, 40)
                     
-                    // --- 2. MAIN FORM CARD ---
                     VStack(spacing: 24) {
                         
-                        // Full Name Field
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Full Name")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundColor(.themeTextVariant)
-                                .focused($focusedField, equals: .fullName)
-                                .submitLabel(.next)
-                                .onSubmit { focusedField = .email }
                             
                             HStack {
                                 Image(systemName: "person")
                                     .foregroundColor(.themeTextVariant)
                                     .frame(width: 20)
                                 TextField("Alex Morgan", text: $fullName)
+                                    .focused($focusedField, equals: .fullName)
+                                    .submitLabel(.next)
+                                    .onSubmit { focusedField = .email }
                             }
                             .padding(16)
                             .background(Color(.systemGray6).opacity(0.6))
                             .cornerRadius(16)
                         }
                         
-                        // Email Field
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Email")
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .foregroundColor(.themeTextVariant)
-                                .focused($focusedField, equals: .email)
-                                .submitLabel(.next)
-                                .onSubmit { focusedField = .password }
                             
                             HStack {
                                 Image(systemName: "envelope")
@@ -86,13 +81,15 @@ struct RegisterView: View {
                                     .keyboardType(.emailAddress)
                                     .autocapitalization(.none)
                                     .disableAutocorrection(true)
+                                    .focused($focusedField, equals: .email)
+                                    .submitLabel(.next)
+                                    .onSubmit { focusedField = .password }
                             }
                             .padding(16)
                             .background(Color(.systemGray6).opacity(0.6))
                             .cornerRadius(16)
                         }
                         
-                        // Password Field
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Password")
                                 .font(.caption)
@@ -105,35 +102,44 @@ struct RegisterView: View {
                                 focusedField: $focusedField,
                                 fieldType: .password,
                                 submitAction: {
+                                    // Keyboard Return Key triggers Firebase Register
                                     if !email.isEmpty && !password.isEmpty && !fullName.isEmpty {
-                                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                        withAnimation { isAuthenticated = true }
+                                        performRegistration()
                                     }
                                 }
                             )
                         }
                         
-                        // Sign Up Button
+                        if let errorMessage = authViewModel.errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundColor(.red)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 16)
+                        }
+                        
+                        // Firebase Sign Up Button
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            withAnimation {
-                                isAuthenticated = true
-                            }
+                            performRegistration()
                         }) {
                             HStack {
-                                Text("Sign Up")
-                                Image(systemName: "arrow.right")
+                                if authViewModel.isLoading {
+                                    ProgressView().tint(.white)
+                                } else {
+                                    Text("Sign Up")
+                                    Image(systemName: "arrow.right")
+                                }
                             }
                             .font(.headline)
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 16)
-                            .background(email.isEmpty || password.isEmpty || fullName.isEmpty ? Color.gray.opacity(0.5) : Color.themePrimary)
+                            .background(email.isEmpty || password.isEmpty || fullName.isEmpty || authViewModel.isLoading ? Color.gray.opacity(0.5) : Color.themePrimary)
                             .cornerRadius(30)
-                            .shadow(color: email.isEmpty || password.isEmpty || fullName.isEmpty ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                            .shadow(color: email.isEmpty || password.isEmpty || fullName.isEmpty || authViewModel.isLoading ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
                         }
                         .buttonStyle(SpringyButtonStyle())
-                        .disabled(email.isEmpty || password.isEmpty || fullName.isEmpty)
+                        .disabled(email.isEmpty || password.isEmpty || fullName.isEmpty || authViewModel.isLoading)
                         .padding(.top, 8)
                         
                     }
@@ -144,7 +150,6 @@ struct RegisterView: View {
                     
                     Spacer(minLength: 40)
                     
-                    // --- 3. BACK TO LOGIN LINK ---
                     Button(action: {
                         presentationMode.wrappedValue.dismiss()
                     }) {
@@ -164,6 +169,15 @@ struct RegisterView: View {
             .scrollDismissesKeyboard(.interactively)
         }
         .navigationBarHidden(true)
+    }
+    
+    private func performRegistration() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        authViewModel.register(email: email, password: password) { success in
+            if success {
+                withAnimation { isAuthenticated = true }
+            }
+        }
     }
 }
 

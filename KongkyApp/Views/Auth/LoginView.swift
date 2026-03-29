@@ -15,21 +15,22 @@ struct LoginView: View {
     @FocusState private var focusedField: AuthField?
     @Binding var isAuthenticated: Bool
     
+    // Connect the ViewModel
+    @StateObject private var authViewModel = AuthViewModel()
+    
     @State private var email = ""
     @State private var password = ""
     
     var body: some View {
         NavigationStack {
             ZStack {
-                // Layer 0 Background
                 Color.themeSurface.ignoresSafeArea()
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 32) {
                         
-                        // --- 1. LOGO & HEADER ---
                         VStack(spacing: 16) {
-                            Image("KongkyLogo") // Add Asset project logo
+                            Image("KongkyLogo")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 64, height: 64)
@@ -48,10 +49,8 @@ struct LoginView: View {
                         }
                         .padding(.top, 40)
                         
-                        // --- 2. MAIN FORM CARD ---
                         VStack(spacing: 24) {
                             
-                            // Email Field
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Email")
                                     .font(.caption)
@@ -66,7 +65,6 @@ struct LoginView: View {
                                         .keyboardType(.emailAddress)
                                         .autocapitalization(.none)
                                         .disableAutocorrection(true)
-                                    // Keyboard Focus Logic
                                         .focused($focusedField, equals: .email)
                                         .submitLabel(.next)
                                         .onSubmit { focusedField = .password }
@@ -76,29 +74,26 @@ struct LoginView: View {
                                 .cornerRadius(16)
                             }
                             
-                            // Password Field
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Password")
                                     .font(.caption)
                                     .fontWeight(.bold)
                                     .foregroundColor(.themeTextVariant)
                                 
-                                // NEW: Passing focus state down
                                 AuthPasswordToggleField(
                                     placeholder: "••••••••",
                                     text: $password,
                                     focusedField: $focusedField,
                                     fieldType: .password,
                                     submitAction: {
+                                        // Keyboard Return Key triggers Firebase Login
                                         if !email.isEmpty && !password.isEmpty {
-                                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                            withAnimation { isAuthenticated = true }
+                                            performLogin()
                                         }
                                     }
                                 )
                             }
                             
-                            // Forgot Password Link
                             HStack {
                                 Spacer()
                                 NavigationLink(destination: ForgotPasswordView()) {
@@ -110,29 +105,37 @@ struct LoginView: View {
                             }
                             .padding(.top, -8)
                             
-                            // Login Button
+                            if let errorMessage = authViewModel.errorMessage {
+                                Text(errorMessage)
+                                    .font(.caption)
+                                    .foregroundColor(.red)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 16)
+                            }
+                            
+                            // Firebase Login Button
                             Button(action: {
-                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                                withAnimation {
-                                    isAuthenticated = true
-                                }
+                                performLogin()
                             }) {
                                 HStack {
-                                    Text("Log In")
-                                    Image(systemName: "arrow.right")
+                                    if authViewModel.isLoading {
+                                        ProgressView().tint(.white)
+                                    } else {
+                                        Text("Log In")
+                                        Image(systemName: "arrow.right")
+                                    }
                                 }
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(email.isEmpty || password.isEmpty ? Color.gray.opacity(0.5) : Color.themePrimary)
+                                .background(email.isEmpty || password.isEmpty || authViewModel.isLoading ? Color.gray.opacity(0.5) : Color.themePrimary)
                                 .cornerRadius(30)
-                                .shadow(color: email.isEmpty || password.isEmpty ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+                                .shadow(color: email.isEmpty || password.isEmpty || authViewModel.isLoading ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
                             }
                             .buttonStyle(SpringyButtonStyle())
-                            .disabled(email.isEmpty || password.isEmpty)
+                            .disabled(email.isEmpty || password.isEmpty || authViewModel.isLoading)
                             
-                            // OR CONTINUE WITH Divider
                             HStack(spacing: 16) {
                                 Rectangle().fill(Color(.systemGray5)).frame(height: 1)
                                 Text("OR CONTINUE WITH")
@@ -143,7 +146,6 @@ struct LoginView: View {
                             }
                             .padding(.vertical, 8)
                             
-                            // Social Login Buttons
                             HStack(spacing: 16) {
                                 Button(action: { UIImpactFeedbackGenerator(style: .light).impactOccurred() }) {
                                     HStack {
@@ -179,7 +181,6 @@ struct LoginView: View {
                         
                         Spacer()
                         
-                        // --- 3. SIGN UP LINK ---
                         NavigationLink(destination: RegisterView(isAuthenticated: $isAuthenticated)) {
                             HStack(spacing: 4) {
                                 Text("Don't have an account?")
@@ -197,6 +198,15 @@ struct LoginView: View {
                 .scrollDismissesKeyboard(.interactively)
             }
             .navigationBarHidden(true)
+        }
+    }
+    
+    private func performLogin() {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        authViewModel.login(email: email, password: password) { success in
+            if success {
+                withAnimation { isAuthenticated = true }
+            }
         }
     }
 }
