@@ -55,7 +55,7 @@ struct EventRowView: View {
         organizerName: "Dimas",
         category: "Tea Time",
         maxCapacity: 10,
-        participantEmails: Array(repeating: "user@test.com", count: 12)
+        participants: (0..<12).map { EventParticipant(email: "user\($0)@test.com", name: "User \($0)") }
     ))
     .padding()
 }

@@ -17,7 +17,6 @@ struct ParticipantsListView: View {
                 // --- 1. MAIN SLOTS SECTION ---
                 VStack(alignment: .leading, spacing: 16) {
                     
-                    // Header
                     HStack(spacing: 8) {
                         Text("Main Slots")
                             .font(.title2)
@@ -30,15 +29,19 @@ struct ParticipantsListView: View {
                     }
                     .padding(.horizontal, 20)
                     
-                    // Container for Main Participants
                     VStack(spacing: 12) {
                         ForEach(0..<event.mainSlotsFilled, id: \.self) { index in
-                            // Logic to make the first person the Organizer
-                            let isOrganizer = index == 0
+                            
+                            // 1. Read directly from Firebase objects
+                            let participant = index < event.participants.count ? event.participants[index] : nil
+                            let email = participant?.email ?? ""
+                            let realName = participant?.name ?? "Participant"
+                            
+                            let isOrganizer = (email == event.organizerEmail) && !email.isEmpty
                             let roleText = isOrganizer ? "Organizer" : (index % 2 == 0 ? "Morning Session" : "Afternoon Session")
                             
                             ParticipantMainRow(
-                                name: "Participant \(index + 1)",
+                                name: realName,
                                 role: roleText,
                                 isOrganizer: isOrganizer
                             )
@@ -50,11 +53,10 @@ struct ParticipantsListView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                // --- 2. QUEUE SECTION (Only shows if there's a queue) ---
+                // --- 2. QUEUE SECTION ---
                 if event.queueCount > 0 {
                     VStack(alignment: .leading, spacing: 16) {
                         
-                        // Header
                         HStack(spacing: 8) {
                             Text("Mingling / Queue")
                                 .font(.title2)
@@ -67,13 +69,18 @@ struct ParticipantsListView: View {
                         }
                         .padding(.horizontal, 20)
                         
-                        // Queue Items
                         VStack(spacing: 12) {
                             ForEach(0..<event.queueCount, id: \.self) { index in
+                                
+                                // Read the queue members from the objects
+                                let actualIndex = event.maxCapacity + index
+                                let participant = actualIndex < event.participants.count ? event.participants[actualIndex] : nil
+                                let realName = participant?.name ?? "Queue Member"
+                                
                                 let sessionText = index % 2 == 0 ? "Afternoon Session" : "Morning Session"
                                 
                                 ParticipantQueueRow(
-                                    name: "Queue Member \(index + 1)",
+                                    name: realName, 
                                     session: sessionText
                                 )
                             }
@@ -125,7 +132,7 @@ struct ParticipantsListView: View {
             }
             .padding(.top, 20)
         }
-        .background(Color.themeSurface.ignoresSafeArea()) // Layer 0 Background
+        .background(Color.themeSurface.ignoresSafeArea())
         .navigationTitle("Participants")
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -139,7 +146,6 @@ struct ParticipantMainRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Profile Picture Placeholder
             ZStack(alignment: .bottomTrailing) {
                 Circle()
                     .fill(Color.themePrimary.opacity(0.15))
@@ -149,7 +155,6 @@ struct ParticipantMainRow: View {
                             .foregroundColor(.themePrimary)
                     )
                 
-                // Organizer Star Badge
                 if isOrganizer {
                     Image(systemName: "star.fill")
                         .font(.system(size: 10))
@@ -171,7 +176,6 @@ struct ParticipantMainRow: View {
                     .font(.subheadline)
                     .foregroundColor(.themeTextVariant)
             }
-            
             Spacer()
         }
         .padding(16)
@@ -188,7 +192,6 @@ struct ParticipantQueueRow: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            // Profile Picture Placeholder
             Circle()
                 .fill(Color(.systemGray4))
                 .frame(width: 48, height: 48)
@@ -206,9 +209,8 @@ struct ParticipantQueueRow: View {
                     .font(.caption2)
                     .fontWeight(.bold)
                     .foregroundColor(.themeTextVariant)
-                    .tracking(1) // Adds that slight letter spacing
+                    .tracking(1)
             }
-            
             Spacer()
         }
         .padding(16)
@@ -226,10 +228,15 @@ struct ParticipantQueueRow: View {
             date: "12 Dec",
             time: "19:00",
             cost: 20000,
-            organizerName: "Alex",
+            organizerName: "Dimas Daffa",
+            organizerEmail: "dimas@example.com",
             category: "Board Game",
             maxCapacity: 5,
-            participantEmails: Array(repeating: "user@test.com", count: 8)
+            participants: [
+                EventParticipant(email: "dimas@example.com", name: "Dimas Daffa"),
+                EventParticipant(email: "sarah@gmail.com", name: "Sarah Jenkins"),
+                EventParticipant(email: "mike@yahoo.com", name: "Mike Ross")
+            ]
         ))
     }
 }

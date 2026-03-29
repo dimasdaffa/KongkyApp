@@ -100,7 +100,7 @@ struct ProfileView: View {
     private var statsRow: some View {
         let currentUserEmail = Auth.auth().currentUser?.email ?? ""
         let hostedCount = viewModel.events.filter { $0.organizerEmail == currentUserEmail }.count
-        let joinedCount = viewModel.events.filter { $0.organizerEmail != currentUserEmail }.count
+        let joinedCount = viewModel.events.filter { $0.isJoinedBy(email: currentUserEmail) }.count
         
         return HStack(spacing: 40) {
             VStack(spacing: 4) {

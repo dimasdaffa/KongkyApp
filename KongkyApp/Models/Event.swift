@@ -25,10 +25,10 @@ struct Event: Identifiable, Codable {
     var timeframe: String = "This Week"
     var maxCapacity: Int
     var imageURL: String?
-    var participantEmails: [String] = []
+    var participants: [EventParticipant] = []
     
     var joinedParticipants: Int {
-        return participantEmails.count
+        return participants.count
     }
     
     var coordinate: CLLocationCoordinate2D {
@@ -105,15 +105,20 @@ struct Event: Identifiable, Codable {
     }
     
     // MARK: - Join Logic
-    mutating func toggleJoin(for email: String) {
-        if participantEmails.contains(email) {
-            participantEmails.removeAll { $0 == email } // Leave
-        } else {
-            participantEmails.append(email) // Join
+    mutating func toggleJoin(email: String, name: String) {
+            if let index = participants.firstIndex(where: { $0.email == email }) {
+                participants.remove(at: index) // Leave
+            } else {
+                participants.append(EventParticipant(email: email, name: name)) // Join
+            }
         }
-    }
     
     func isJoinedBy(email: String) -> Bool {
-        return participantEmails.contains(email)
-    }
+            return participants.contains(where: { $0.email == email })
+        }
+}
+
+struct EventParticipant: Codable, Hashable {
+    var email: String
+    var name: String
 }

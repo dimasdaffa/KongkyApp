@@ -349,8 +349,9 @@ struct ActivityDetailView: View {
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                     
                     // Tell Firebase to add the user
+                    let currentUserName = Auth.auth().currentUser?.displayName ?? "User"
                     var updatedEvent = event
-                    updatedEvent.toggleJoin(for: currentUserEmail)
+                    updatedEvent.toggleJoin(email: currentUserEmail, name: currentUserName)
                     viewModel.updateEvent(event: updatedEvent)
                     
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
@@ -402,8 +403,9 @@ struct ActivityDetailView: View {
                 Button("Leave Activity", role: .destructive) {
                     withAnimation(.spring()) {
                         // Tell Firebase to remove the user
+                        let currentUserName = Auth.auth().currentUser?.displayName ?? "User"
                         var updatedEvent = event
-                        updatedEvent.toggleJoin(for: currentUserEmail)
+                        updatedEvent.toggleJoin(email: currentUserEmail, name: currentUserName)
                         viewModel.updateEvent(event: updatedEvent)
                     }
                 }
@@ -460,7 +462,7 @@ struct ActivityDetailView: View {
             organizerName: "Dimas Daffa",
             category: "Share Meal",
             maxCapacity: 5,
-            participantEmails: Array(repeating: "test@example.com", count: 8) // Simulating 8 participants
+            participants: (0..<8).map { EventParticipant(email: "user\($0)@test.com", name: "User \($0)") }
         ))
     }
 }

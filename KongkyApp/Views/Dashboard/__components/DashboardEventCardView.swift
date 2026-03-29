@@ -165,7 +165,7 @@ struct DashboardEventCard: View {
         organizerName: "Alex",
         category: "Board Game",
         maxCapacity: 5,
-        participantEmails: Array(repeating: "user@test.com", count: 9) // Should show 3 circles and "+6"
+        participants: (0..<9).map { EventParticipant(email: "user\($0)@test.com", name: "User \($0)") } // Should show 3 circles and "+6"
     ))
     .padding()
 }

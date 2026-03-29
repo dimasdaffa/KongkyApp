@@ -46,7 +46,7 @@ struct MyActivitiesView: View {
                         
                         let filteredEvents = selectedTab == "Hosted"
                         ? viewModel.events.filter { $0.organizerEmail == currentUserEmail }
-                        : viewModel.events.filter { $0.isJoinedBy(email: currentUserEmail) && $0.organizerEmail != currentUserEmail }
+                        : viewModel.events.filter { $0.isJoinedBy(email: currentUserEmail) }
                         
                         if filteredEvents.isEmpty {
                             emptyState
@@ -262,8 +262,9 @@ struct MyActivitiesView: View {
     
     func confirmLeave(event: Event) {
         let currentUserEmail = Auth.auth().currentUser?.email ?? ""
+        let currentUserName = Auth.auth().currentUser?.displayName ?? "User"
         var updatedEvent = event
-        updatedEvent.toggleJoin(for: currentUserEmail)
+        updatedEvent.toggleJoin(email: currentUserEmail, name: currentUserName)
         viewModel.updateEvent(event: updatedEvent)
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)

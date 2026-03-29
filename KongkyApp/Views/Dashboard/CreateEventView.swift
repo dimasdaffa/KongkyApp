@@ -439,6 +439,7 @@ struct CreateEventView: View {
         let formattedTime = "\(startString) - \(endString)" // Creates "19:00 - 21:00"
         
         let currentUserEmail = Auth.auth().currentUser?.email ?? ""
+        let currentUserName = Auth.auth().currentUser?.displayName ?? "Kongky User"
         let newEvent = Event(
             title: title.isEmpty ? "Untitled Event" : title,
             description: description,
@@ -450,7 +451,7 @@ struct CreateEventView: View {
             organizerEmail: Auth.auth().currentUser?.email ?? "",
             category: category,
             maxCapacity: capacityInt,
-            participantEmails: [currentUserEmail]
+            participants: [EventParticipant(email: currentUserEmail, name: currentUserName)]
         )
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
