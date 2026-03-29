@@ -7,11 +7,16 @@
 
 import SwiftUI
 import PhotosUI
+import FirebaseAuth
+import FirebaseFirestore
 
 struct SettingsView: View {
-    @State private var username = "Dimas Daffa"
+    // Kick the user out when they delete their account
+    @Binding var isAuthenticated: Bool
+    
+    @State private var username = ""
     @State private var session = "Afternoon"
-    @State private var email = "alex@example.com"
+    @State private var email = ""
     
     @State private var currentPassword = ""
     @State private var newPassword = ""
@@ -20,9 +25,14 @@ struct SettingsView: View {
     @State private var selectedItem: PhotosPickerItem? = nil
     @State private var profileImage: UIImage? = nil
     
-    // NEW: Alert & Toast States
+    // Alert & Toast States
     @State private var showToast = false
+    @State private var toastMessage = ""
     @State private var showDeleteAlert = false
+    
+    // Error Alert States
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
     
     var body: some View {
         ZStack {
@@ -48,7 +58,7 @@ struct SettingsView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             
-            // NEW: The Top Toast Notification
+            // The Top Toast Notification
             if showToast {
                 toastNotification
             }
@@ -56,16 +66,27 @@ struct SettingsView: View {
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .tabBar)
+        .onAppear {
+            // Load the saved session from the device, and name/email from Firebase
+            username = Auth.auth().currentUser?.displayName ?? "User Name"
+            email = Auth.auth().currentUser?.email ?? "No Email"
+            session = UserDefaults.standard.string(forKey: "preferredSession") ?? "Afternoon"
+        }
         
-        // NEW: Danger Zone Confirmation Alert
+        // Danger Zone Confirmation Alert
         .alert("Delete Account?", isPresented: $showDeleteAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Delete Account", role: .destructive) {
-                // TODO: Add Firebase Account Deletion Logic Here
-                print("Account successfully deleted.")
+                deleteAccountAndData()
             }
         } message: {
-            Text("Are you sure you want to permanently delete your account? This action cannot be undone.")
+            Text("Are you sure you want to permanently delete your account and all activities you have hosted? This action cannot be undone.")
+        }
+        // Firebase Error Alert
+        .alert("Error", isPresented: $showErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
         }
     }
     
@@ -113,10 +134,13 @@ struct SettingsView: View {
             }
             
             VStack(spacing: 4) {
-                Text("Alex Morgan")
+                Text(username)
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.themeText)
+                Text(email)
+                    .font(.subheadline)
+                    .foregroundColor(.themeTextVariant)
             }
         }
     }
@@ -165,7 +189,7 @@ struct SettingsView: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Preferred Activity Session")
+                Text("Academy Session")
                     .font(.caption)
                     .fontWeight(.bold)
                     .foregroundColor(.themeTextVariant)
@@ -175,6 +199,24 @@ struct SettingsView: View {
                     sessionButton(title: "Afternoon", icon: "moon", isSelected: session == "Afternoon")
                 }
             }
+            
+            Button(action: {
+                updateProfile()
+            }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle")
+                    Text("Save Profile")
+                }
+                .font(.headline)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(username.isEmpty ? Color(.systemGray4) : Color.themePrimary)
+                .cornerRadius(12)
+            }
+            .buttonStyle(SpringyButtonStyle())
+            .disabled(username.isEmpty)
+            .padding(.top, 8)
         }
         .padding(20)
         .background(Color.white)
@@ -259,15 +301,6 @@ struct SettingsView: View {
             .padding(.bottom, 4)
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Current Password")
-                    .font(.caption)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                
-                PasswordToggleField(placeholder: "••••••••", text: $currentPassword)
-            }
-            
-            VStack(alignment: .leading, spacing: 8) {
                 Text("New Password")
                     .font(.caption)
                     .fontWeight(.bold)
@@ -277,25 +310,7 @@ struct SettingsView: View {
             }
             
             Button(action: {
-                // 1. Vibrate & Close Keyboard
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                
-                // 2. Clear the fields to show it was successful
-                currentPassword = ""
-                newPassword = ""
-                
-                // 3. Drop the toast notification
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-                    showToast = true
-                }
-                
-                // 4. Hide the toast after 3 seconds
-                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        showToast = false
-                    }
-                }
+                updatePassword()
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "arrow.triangle.2.circlepath")
@@ -305,11 +320,11 @@ struct SettingsView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 16)
-                .background(currentPassword.isEmpty || newPassword.isEmpty ? Color(.systemGray4) : Color.themePrimary)
+                .background(newPassword.isEmpty ? Color(.systemGray4) : Color.themePrimary)
                 .cornerRadius(12)
             }
             .buttonStyle(SpringyButtonStyle())
-            .disabled(currentPassword.isEmpty || newPassword.isEmpty)
+            .disabled(newPassword.isEmpty)
         }
         .padding(20)
         .background(Color.white)
@@ -335,7 +350,6 @@ struct SettingsView: View {
                 .padding(.bottom, 8)
             
             Button(action: {
-                // Trigger the alert!
                 UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                 showDeleteAlert = true
             }) {
@@ -363,15 +377,14 @@ struct SettingsView: View {
         )
     }
     
-    // NEW: The Glassmorphism Toast View
     private var toastNotification: some View {
         VStack {
             HStack(spacing: 12) {
-                Image(systemName: "checkmark.shield.fill")
+                Image(systemName: "checkmark.circle.fill")
                     .font(.title3)
                     .foregroundColor(.themePrimary)
                 
-                Text("Password successfully updated!")
+                Text(toastMessage)
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundColor(.themeText)
@@ -391,6 +404,100 @@ struct SettingsView: View {
         }
         .transition(.move(edge: .top).combined(with: .opacity))
         .zIndex(2)
+    }
+    
+    // MARK: - Firebase & System Actions
+    
+    private func updateProfile() {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        // 1. Save Session locally to the device
+        UserDefaults.standard.set(session, forKey: "preferredSession")
+        
+        // 2. Save Name to Firebase
+        let request = user.createProfileChangeRequest()
+        request.displayName = username
+        request.commitChanges { error in
+            if let error = error {
+                errorMessage = error.localizedDescription
+                showErrorAlert = true
+            } else {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                
+                toastMessage = "Profile successfully updated!"
+                showToastSequence()
+            }
+        }
+    }
+    
+    private func updatePassword() {
+        guard let user = Auth.auth().currentUser else { return }
+        
+        user.updatePassword(to: newPassword) { error in
+            if let error = error {
+                errorMessage = error.localizedDescription
+                if errorMessage.contains("requires recent authentication") {
+                    errorMessage = "For security reasons, please log out and log back in before updating your password."
+                }
+                showErrorAlert = true
+            } else {
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                
+                newPassword = ""
+                toastMessage = "Password successfully updated!"
+                showToastSequence()
+            }
+        }
+    }
+    
+    // Helper to fire the toast animation cleanly
+    private func showToastSequence() {
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+            showToast = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            withAnimation(.easeInOut(duration: 0.3)) {
+                showToast = false
+            }
+        }
+    }
+    
+    private func deleteAccountAndData() {
+        guard let user = Auth.auth().currentUser, let userEmail = user.email else { return }
+        let db = Firestore.firestore()
+        
+        db.collection("activities").whereField("organizerEmail", isEqualTo: userEmail).getDocuments { snapshot, error in
+            if let error = error {
+                print("Error finding activities to delete: \(error.localizedDescription)")
+            }
+            
+            let batch = db.batch()
+            snapshot?.documents.forEach { document in
+                batch.deleteDocument(document.reference)
+            }
+            
+            batch.commit { batchError in
+                if let batchError = batchError {
+                    print("Error deleting activities: \(batchError.localizedDescription)")
+                }
+                
+                user.delete { authError in
+                    if let authError = authError {
+                        errorMessage = authError.localizedDescription
+                        if errorMessage.contains("requires recent authentication") {
+                            errorMessage = "For security reasons, please log out and log back in before deleting your account."
+                        }
+                        showErrorAlert = true
+                    } else {
+                        withAnimation {
+                            isAuthenticated = false
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -427,6 +534,6 @@ struct PasswordToggleField: View {
 
 #Preview {
     NavigationView {
-        SettingsView()
+        SettingsView(isAuthenticated: .constant(true))
     }
 }

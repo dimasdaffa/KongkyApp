@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct DashboardView: View {
     @State private var searchText = ""
@@ -68,7 +69,7 @@ struct DashboardView: View {
                             Text(dynamicGreeting)
                                 .font(.subheadline)
                                 .foregroundColor(.themeTextVariant)
-                            Text("Dimas Daffa")
+                            Text(Auth.auth().currentUser?.displayName ?? "Alex Testing")
                                 .font(.largeTitle)
                                 .fontWeight(.heavy)
                                 .foregroundColor(.themeText)

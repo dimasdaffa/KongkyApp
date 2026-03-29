@@ -27,26 +27,32 @@ class AuthViewModel: ObservableObject {
     }
     
     // MARK: - Sign Up
-    func register(email: String, password: String, completion: @escaping (Bool) -> Void) {
-        self.isLoading = true
-        self.errorMessage = nil
-        
-        Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
-            DispatchQueue.main.async {
-                self?.isLoading = false
-                
+    func register(email: String, password: String, fullName: String, completion: @escaping (Bool) -> Void) {
+            self.isLoading = true
+            self.errorMessage = nil
+            
+            Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
                 if let error = error {
-                    self?.errorMessage = error.localizedDescription
-                    print("Registration Error: \(error.localizedDescription)")
-                    completion(false)
+                    DispatchQueue.main.async {
+                        self?.isLoading = false
+                        self?.errorMessage = error.localizedDescription
+                        completion(false)
+                    }
                     return
                 }
                 
-                // Successfully created an account
-                completion(true)
+                // Save the Full Name directly into their Firebase Profile
+                let changeRequest = result?.user.createProfileChangeRequest()
+                changeRequest?.displayName = fullName
+                changeRequest?.commitChanges { _ in
+                    DispatchQueue.main.async {
+                        self?.isLoading = false
+                        self?.userSession = Auth.auth().currentUser // Force refresh to get the name
+                        completion(true)
+                    }
+                }
             }
         }
-    }
     
     // MARK: - Log In
     func login(email: String, password: String, completion: @escaping (Bool) -> Void) {

@@ -6,8 +6,11 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct SavedEventsView: View {
+    let currentUserEmail = Auth.auth().currentUser?.email ?? ""
+    
     @StateObject private var viewModel = HomeViewModel()
     @Binding var selectedTab: Int
     @Environment(\.presentationMode) var presentationMode
@@ -18,7 +21,7 @@ struct SavedEventsView: View {
             Color.themeSurface.ignoresSafeArea()
             
             ScrollView(showsIndicators: false) {
-                let savedEvents = viewModel.events.filter { $0.isSaved }
+                let savedEvents = viewModel.events.filter { $0.isSavedBy(email: currentUserEmail) }
                 
                 VStack(spacing: 0) {
                     

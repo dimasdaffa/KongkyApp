@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 struct MyActivitiesView: View {
+    
     @StateObject private var viewModel = HomeViewModel()
     
     @State private var selectedTab = "Joined"
@@ -40,10 +42,11 @@ struct MyActivitiesView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
+                        let currentUserEmail = Auth.auth().currentUser?.email ?? ""
                         
                         let filteredEvents = selectedTab == "Hosted"
-                            ? viewModel.events.filter { $0.organizerName == "Dimas Daffa" } // Updated to match your creation default!
-                            : viewModel.events.filter { $0.organizerName != "Dimas Daffa" }
+                        ? viewModel.events.filter { $0.organizerEmail == currentUserEmail }
+                        : viewModel.events.filter { $0.organizerEmail != currentUserEmail }
                         
                         if filteredEvents.isEmpty {
                             emptyState
@@ -68,7 +71,7 @@ struct MyActivitiesView: View {
                                 )
                             }
                         }
-                            ctaSection
+                        ctaSection
                         
                         Color.clear.frame(height: 40)
                     }
@@ -178,10 +181,10 @@ struct MyActivitiesView: View {
             Text(selectedTab == "Hosted"
                  ? "Create your first gathering and invite friends to split the cost."
                  : "Explore the dashboard to find your next favorite hangout.")
-                .font(.subheadline)
-                .foregroundColor(.themeTextVariant)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+            .font(.subheadline)
+            .foregroundColor(.themeTextVariant)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 32)
         }
         .padding(.bottom, 32)
     }

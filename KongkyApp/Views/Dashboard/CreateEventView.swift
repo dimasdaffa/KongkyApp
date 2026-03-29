@@ -8,6 +8,7 @@
 import SwiftUI
 import PhotosUI
 import MapKit
+import FirebaseAuth
 
 struct CreateEventView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -41,12 +42,12 @@ struct CreateEventView: View {
     
     // Validation Check
     private var isFormValid: Bool {
-            !title.trimmingCharacters(in: .whitespaces).isEmpty &&
-            !description.trimmingCharacters(in: .whitespaces).isEmpty &&
-            !locationText.trimmingCharacters(in: .whitespaces).isEmpty &&
-            !cost.isEmpty &&
-            !maxCapacity.isEmpty
-        }
+        !title.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !description.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !locationText.trimmingCharacters(in: .whitespaces).isEmpty &&
+        !cost.isEmpty &&
+        !maxCapacity.isEmpty
+    }
     
     let categories = ["Board Game", "Tea Time", "Sport", "Watch Party", "Share Meal", "Other"]
     
@@ -331,7 +332,7 @@ struct CreateEventView: View {
                         .tracking(1)
                     TextField("Max pax", text: $maxCapacity)
                         .keyboardType(.numberPad)
-                        // Filters out letters
+                    // Filters out letters
                         .onChange(of: maxCapacity) { _, newValue in
                             maxCapacity = newValue.filter { "0123456789".contains($0) }
                         }
@@ -348,7 +349,7 @@ struct CreateEventView: View {
                         .tracking(1)
                     TextField("E.g. 50000", text: $cost)
                         .keyboardType(.numberPad)
-                        // Filters out letters
+                    // Filters out letters
                         .onChange(of: cost) { _, newValue in
                             cost = newValue.filter { "0123456789".contains($0) }
                         }
@@ -361,36 +362,36 @@ struct CreateEventView: View {
     }
     
     private var stickyCreateButton: some View {
-            VStack {
-                Button(action: {
-                    if isFormValid && !isCreated {
-                        saveEvent()
-                    }
-                }) {
-                    HStack {
-                        if isCreated {
-                            Image(systemName: "checkmark.circle.fill")
-                        }
-                        Text(isCreated ? "Activity Created" : "Create Activity")
-                    }
-                    .font(.headline)
-                    .foregroundColor(isCreated ? .themeTextVariant : .white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                    // Use gray if invalid, success color if created, or primary blue if ready
-                    .background(!isFormValid ? Color.gray.opacity(0.5) : (isCreated ? Color(.systemGray5) : Color.themePrimary))
-                    .cornerRadius(30)
-                    .shadow(color: (!isFormValid || isCreated) ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
+        VStack {
+            Button(action: {
+                if isFormValid && !isCreated {
+                    saveEvent()
                 }
-                .buttonStyle(SpringyButtonStyle())
-                // Lock the button until form is valid
-                .disabled(!isFormValid || isCreated)
+            }) {
+                HStack {
+                    if isCreated {
+                        Image(systemName: "checkmark.circle.fill")
+                    }
+                    Text(isCreated ? "Activity Created" : "Create Activity")
+                }
+                .font(.headline)
+                .foregroundColor(isCreated ? .themeTextVariant : .white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                // Use gray if invalid, success color if created, or primary blue if ready
+                .background(!isFormValid ? Color.gray.opacity(0.5) : (isCreated ? Color(.systemGray5) : Color.themePrimary))
+                .cornerRadius(30)
+                .shadow(color: (!isFormValid || isCreated) ? .clear : Color.themePrimary.opacity(0.3), radius: 10, x: 0, y: 6)
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 16)
-            .padding(.bottom, 20)
-            .background(.ultraThinMaterial)
+            .buttonStyle(SpringyButtonStyle())
+            // Lock the button until form is valid
+            .disabled(!isFormValid || isCreated)
         }
+        .padding(.horizontal, 20)
+        .padding(.top, 16)
+        .padding(.bottom, 20)
+        .background(.ultraThinMaterial)
+    }
     
     private var toastNotification: some View {
         VStack {
@@ -445,7 +446,8 @@ struct CreateEventView: View {
             date: formattedDate,
             time: formattedTime,
             cost: costInt,
-            organizerName: "Dimas Daffa",
+            organizerName: Auth.auth().currentUser?.displayName ?? "Kongky User",
+            organizerEmail: Auth.auth().currentUser?.email ?? "",
             category: category,
             maxCapacity: capacityInt,
             joinedParticipants: 1
@@ -453,7 +455,7 @@ struct CreateEventView: View {
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         
-       /* viewModel.events.insert(newEvent, at: 0)*/ // Dummy
+        /* viewModel.events.insert(newEvent, at: 0)*/ // Dummy
         viewModel.addEvent(event: newEvent)
         
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {

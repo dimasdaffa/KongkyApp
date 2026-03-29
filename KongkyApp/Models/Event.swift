@@ -11,9 +11,6 @@ import FirebaseFirestore
 
 struct Event: Identifiable, Codable {
     @DocumentID var id: String?
-    
-//    var id: String = UUID().uuidString //need to change if firebase
-
     var title: String
     var description: String
     var location: String
@@ -21,6 +18,8 @@ struct Event: Identifiable, Codable {
     var time: String
     var cost: Int
     var organizerName: String
+    var organizerEmail: String? = nil
+    var savedBy: [String]? = []
     var organizerSession: String = "Afternoon Session"
     var category: String
     var timeframe: String = "This Week"
@@ -78,12 +77,25 @@ struct Event: Identifiable, Codable {
         return cost / max(1, nextSlots)
     }
     
-    // Helper to format 50000 into "50k" just like your design!
+    // Helper to format 50000 into "50k" 
     func formatPrice(_ amount: Int) -> String {
-        if amount == 0 { return "Free" } 
+        if amount == 0 { return "Free" }
         if amount >= 1000 {
             return "\(amount / 1000)k"
         }
         return "\(amount)"
+    }
+    
+    mutating func toggleSaved(for email: String) {
+        if savedBy == nil { savedBy = [] }
+        if savedBy!.contains(email) {
+            savedBy!.removeAll { $0 == email } // Un-save
+        } else {
+            savedBy!.append(email) // Save
+        }
+    }
+    
+    func isSavedBy(email: String) -> Bool {
+        return savedBy?.contains(email) ?? false
     }
 }

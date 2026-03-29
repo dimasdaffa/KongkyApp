@@ -172,13 +172,14 @@ struct RegisterView: View {
     }
     
     private func performRegistration() {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        authViewModel.register(email: email, password: password) { success in
-            if success {
-                withAnimation { isAuthenticated = true }
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            // Pass the fullName variable into the ViewModel
+            authViewModel.register(email: email, password: password, fullName: fullName) { success in
+                if success {
+                    withAnimation { isAuthenticated = true }
+                }
             }
         }
-    }
 }
 
 #Preview {
