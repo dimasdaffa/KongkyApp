@@ -8,7 +8,7 @@
 import SwiftUI
 import PhotosUI
 import MapKit
-import FirebaseAuth
+// CurrentUser (from Utilities/) instead of Auth.auth() directly.
 
 struct CreateEventView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -20,7 +20,7 @@ struct CreateEventView: View {
     @State private var locationText = ""
     
     @State private var selectedDate = Date()
-    // NEW: Split into Start and End time
+    // Split into Start and End time
     @State private var selectedStartTime = Date()
     @State private var selectedEndTime = Date().addingTimeInterval(3600) // Defaults to 1 hour later
     
@@ -144,6 +144,12 @@ struct CreateEventView: View {
         }
     }
     
+    // ---------------------------------------------------------
+    // REFACTORED: Uses StyledTextField and CategoryPicker
+    // from Components/EventFormFields.swift
+    // Before: ~60 lines of hand-written UI code
+    // After:  ~15 lines using reusable components
+    // ---------------------------------------------------------
     private var basicInfoSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Basic Info")
@@ -151,61 +157,14 @@ struct CreateEventView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.themeText)
             
-            VStack(alignment: .leading, spacing: 8) {
-                Text("ACTIVITY TITLE")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                    .tracking(1)
-                
-                TextField("What are we doing?", text: $title)
-                    .padding(16)
-                    .background(Color.themePrimary.opacity(0.05))
-                    .cornerRadius(16)
-            }
+            // Reusable component! Same styling as EditEventView automatically.
+            StyledTextField(label: "ACTIVITY TITLE", placeholder: "What are we doing?", text: $title)
             
-            VStack(alignment: .leading, spacing: 12) {
-                Text("CATEGORY")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                    .tracking(1)
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(categories, id: \.self) { cat in
-                            let isSelected = category == cat
-                            Button(action: {
-                                category = cat
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            }) {
-                                Text(cat)
-                                    .font(.subheadline)
-                                    .fontWeight(isSelected ? .semibold : .regular)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(isSelected ? Color.themePrimary : Color(.systemGray6))
-                                    .foregroundColor(isSelected ? .white : .themeText)
-                                    .cornerRadius(20)
-                            }
-                        }
-                    }
-                }
-            }
+            // Reusable category picker with haptic feedback built in
+            CategoryPicker(selectedCategory: $category, categories: categories)
             
-            VStack(alignment: .leading, spacing: 8) {
-                Text("DESCRIPTION")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                    .tracking(1)
-                
-                TextField("Tell everyone more about the vibe...", text: $description, axis: .vertical)
-                    .lineLimit(4...8)
-                    .padding(16)
-                    .background(Color.themePrimary.opacity(0.05))
-                    .cornerRadius(16)
-            }
+            // Multiline text field for descriptions
+            StyledTextField(label: "DESCRIPTION", placeholder: "Tell everyone more about the vibe...", text: $description, isMultiline: true)
         }
     }
     
@@ -322,41 +281,10 @@ struct CreateEventView: View {
                 }
             }
             
-            // --- UPDATED: STRICT NUMBER FILTERING ---
+            // Reusable number-only fields (numbersOnly: true auto-strips letters)
             HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("CAPACITY")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.themeTextVariant)
-                        .tracking(1)
-                    TextField("Max pax", text: $maxCapacity)
-                        .keyboardType(.numberPad)
-                    // Filters out letters
-                        .onChange(of: maxCapacity) { _, newValue in
-                            maxCapacity = newValue.filter { "0123456789".contains($0) }
-                        }
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("TOTAL COST (IDR)")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.themeTextVariant)
-                        .tracking(1)
-                    TextField("E.g. 50000", text: $cost)
-                        .keyboardType(.numberPad)
-                    // Filters out letters
-                        .onChange(of: cost) { _, newValue in
-                            cost = newValue.filter { "0123456789".contains($0) }
-                        }
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
-                }
+                StyledTextField(label: "CAPACITY", placeholder: "Max pax", text: $maxCapacity, keyboardType: .numberPad, numbersOnly: true)
+                StyledTextField(label: "TOTAL COST (IDR)", placeholder: "E.g. 50000", text: $cost, keyboardType: .numberPad, numbersOnly: true)
             }
         }
     }
@@ -393,33 +321,9 @@ struct CreateEventView: View {
         .background(.ultraThinMaterial)
     }
     
+    // Replaced 28 lines of toast UI with the reusable ToastView component!
     private var toastNotification: some View {
-        VStack {
-            HStack(spacing: 12) {
-                Image(systemName: "sparkles")
-                    .font(.title3)
-                    .foregroundColor(.themePrimary)
-                
-                Text("Activity successfully created!")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.themeText)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(.ultraThinMaterial)
-            .cornerRadius(30)
-            .overlay(
-                RoundedRectangle(cornerRadius: 30)
-                    .stroke(Color.white.opacity(0.5), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
-            .padding(.top, 16)
-            
-            Spacer()
-        }
-        .transition(.move(edge: .top).combined(with: .opacity))
-        .zIndex(2)
+        ToastView(icon: "sparkles", message: "Activity successfully created!")
     }
     
     // MARK: - Actions
@@ -438,8 +342,9 @@ struct CreateEventView: View {
         let endString = tf.string(from: selectedEndTime)
         let formattedTime = "\(startString) - \(endString)" // Creates "19:00 - 21:00"
         
-        let currentUserEmail = Auth.auth().currentUser?.email ?? ""
-        let currentUserName = Auth.auth().currentUser?.displayName ?? "Kongky User"
+        // Using CurrentUser helper instead of Auth.auth() directly (Facade Pattern)
+        let currentUserEmail = CurrentUser.email
+        let currentUserName = CurrentUser.displayName
         let newEvent = Event(
             title: title.isEmpty ? "Untitled Event" : title,
             description: description,
@@ -447,8 +352,8 @@ struct CreateEventView: View {
             date: formattedDate,
             time: formattedTime,
             cost: costInt,
-            organizerName: Auth.auth().currentUser?.displayName ?? "Kongky User",
-            organizerEmail: Auth.auth().currentUser?.email ?? "",
+            organizerName: CurrentUser.displayName,
+            organizerEmail: CurrentUser.email,
             category: category,
             maxCapacity: capacityInt,
             participants: [EventParticipant(email: currentUserEmail, name: currentUserName)]
@@ -456,7 +361,6 @@ struct CreateEventView: View {
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         
-        /* viewModel.events.insert(newEvent, at: 0)*/ // Dummy
         viewModel.addEvent(event: newEvent)
         
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
@@ -480,8 +384,3 @@ struct CreateEventView: View {
     CreateEventView(viewModel: HomeViewModel())
 }
 
-extension View {
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-}

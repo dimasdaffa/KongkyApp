@@ -117,8 +117,3 @@ struct Event: Identifiable, Codable {
             return participants.contains(where: { $0.email == email })
         }
 }
-
-struct EventParticipant: Codable, Hashable {
-    var email: String
-    var name: String
-}

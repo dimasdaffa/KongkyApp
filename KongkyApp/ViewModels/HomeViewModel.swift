@@ -7,85 +7,64 @@
 
 import Foundation
 import Combine
-import FirebaseFirestore
 
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
     @Published var isLoading: Bool = true
     
-    // 1. Initialize the Firebase Database
-    private var db = Firestore.firestore()
+    // The service that handles all database operations
+    // Notice the TYPE is the PROTOCOL, not the concrete class!
+    // This is what makes it swappable. 
+    private let eventService: EventServiceProtocol
     
-    init() {
-        // Load dummy data immediately so the screen isn't empty
-        //        loadDummyData()
-        
-        // Then try to fetch the real data from the cloud!
+    // ---------------------------------------------------------
+    // DEPENDENCY INJECTION via initializer
+    // ---------------------------------------------------------
+    // Default value = EventService() → uses real Firebase
+    // You can also pass in a mock: HomeViewModel(eventService: MockEventService())
+    // ---------------------------------------------------------
+    init(eventService: EventServiceProtocol = EventService()) {
+        self.eventService = eventService
         fetchEvents()
     }
     
     // ---------------------------------------------------------
     // READ (Real-time Listener)
     // ---------------------------------------------------------
+    // Now just delegates to the service — no Firebase code here!
+    // ---------------------------------------------------------
     func fetchEvents() {
-        //         This listens to the "activities" table in Firestore
-        db.collection("activities").addSnapshotListener { (querySnapshot, error) in
-            self.isLoading = false
-            
-            guard let documents = querySnapshot?.documents else {
-                print("No documents or offline: \(String(describing: error))")
-                return
-            }
-            
-            // Convert Firebase JSON into our Swift Event structs
-            self.events = documents.compactMap { document -> Event? in
-                try? document.data(as: Event.self)
+        eventService.fetchEvents { [weak self] events in
+            DispatchQueue.main.async {
+                self?.isLoading = false
+                self?.events = events
             }
         }
-        
     }
     
     // ---------------------------------------------------------
     // CREATE
     // ---------------------------------------------------------
     func addEvent(event: Event) {
-        do {
-            // This automatically converts the Swift struct to JSON and saves it!
-            let _ = try db.collection("activities").addDocument(from: event)
-        } catch {
-            print("Error adding event to Firebase: \(error)")
-        }
-        
+        eventService.addEvent(event)
     }
     
     // ---------------------------------------------------------
     // UPDATE
     // ---------------------------------------------------------
     func updateEvent(event: Event) {
-        guard let documentId = event.id else { return }
-        
-        do {
-            try db.collection("activities").document(documentId).setData(from: event)
-        } catch {
-            print("Error updating event in Firebase: \(error)")
-        }
+        eventService.updateEvent(event)
     }
     
     // ---------------------------------------------------------
     // DELETE
     // ---------------------------------------------------------
     func deleteEvent(event: Event) {
-        guard let documentId = event.id else { return }
-        
-        db.collection("activities").document(documentId).delete { error in
-            if let error = error {
-                print("Error removing document: \(error)")
-            }
-        }
+        eventService.deleteEvent(event)
     }
     
     // ---------------------------------------------------------
-    // DUMMY DATA
+    // DUMMY DATA (kept for offline development / previews)
     // ---------------------------------------------------------
     func loadDummyData() {
         self.isLoading = true
@@ -95,13 +74,10 @@ class HomeViewModel: ObservableObject {
         let event3 = Event(id: "dummy3", title: "Iftar Gathering", description: "Lunch together at the famous local spot.", location: "Sederhana Sudirman", date: "Jun 20", time: "16:00 - 19:00", cost: 35000, organizerName: "Dimas Daffa", category: "Share Meal", timeframe: "Completed", maxCapacity: 4, participants: (0..<4).map { EventParticipant(email: "user\($0)@test.com", name: "User \($0)") })
         let event4 = Event(id: "dummy4", title: "Monday Supper", description: "Lunch together at the famous local spot.", location: "Sederhana Sudirman", date: "Jun 16", time: "12:00 - 13:00", cost: 35000, organizerName: "Dimas Daffa", category: "Other", timeframe: "This Week", maxCapacity: 4, participants: (0..<4).map { EventParticipant(email: "user\($0)@test.com", name: "User \($0)") })
         
-        // We delay it by 1 second just to let the skeleton animation show briefly
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            // Only apply dummy data if Firebase hasn't already loaded real data
             if self.events.isEmpty {
                 self.events = [event1, event2, event3, event4]
             }
-            // Turn off loading skeletons
             self.isLoading = false
         }
     }

@@ -183,6 +183,7 @@ struct EditEventView: View {
         }
     }
     
+    // REFACTORED: Uses reusable components from EventFormFields.swift
     private var basicInfoSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Basic Info")
@@ -190,61 +191,11 @@ struct EditEventView: View {
                 .fontWeight(.bold)
                 .foregroundColor(.themeText)
             
-            VStack(alignment: .leading, spacing: 8) {
-                Text("ACTIVITY TITLE")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                    .tracking(1)
-                
-                TextField("What are we doing?", text: $title)
-                    .padding(16)
-                    .background(Color.themePrimary.opacity(0.05))
-                    .cornerRadius(16)
-            }
+            StyledTextField(label: "ACTIVITY TITLE", placeholder: "What are we doing?", text: $title)
             
-            VStack(alignment: .leading, spacing: 12) {
-                Text("CATEGORY")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                    .tracking(1)
-                
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(categories, id: \.self) { cat in
-                            let isSelected = category == cat
-                            Button(action: {
-                                category = cat
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            }) {
-                                Text(cat)
-                                    .font(.subheadline)
-                                    .fontWeight(isSelected ? .semibold : .regular)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(isSelected ? Color.themePrimary : Color(.systemGray6))
-                                    .foregroundColor(isSelected ? .white : .themeText)
-                                    .cornerRadius(20)
-                            }
-                        }
-                    }
-                }
-            }
+            CategoryPicker(selectedCategory: $category, categories: categories)
             
-            VStack(alignment: .leading, spacing: 8) {
-                Text("DESCRIPTION")
-                    .font(.caption2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.themeTextVariant)
-                    .tracking(1)
-                
-                TextField("Tell everyone more about the vibe...", text: $description, axis: .vertical)
-                    .lineLimit(4...8)
-                    .padding(16)
-                    .background(Color.themePrimary.opacity(0.05))
-                    .cornerRadius(16)
-            }
+            StyledTextField(label: "DESCRIPTION", placeholder: "Tell everyone more about the vibe...", text: $description, isMultiline: true)
         }
     }
     
@@ -360,37 +311,8 @@ struct EditEventView: View {
             }
             
             HStack(spacing: 16) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("CAPACITY")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.themeTextVariant)
-                        .tracking(1)
-                    TextField("Max pax", text: $maxCapacity)
-                        .keyboardType(.numberPad)
-                        .onChange(of: maxCapacity) { _, newValue in
-                            maxCapacity = newValue.filter { "0123456789".contains($0) }
-                        }
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
-                }
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("TOTAL COST (IDR)")
-                        .font(.caption2)
-                        .fontWeight(.bold)
-                        .foregroundColor(.themeTextVariant)
-                        .tracking(1)
-                    TextField("E.g. 50000", text: $cost)
-                        .keyboardType(.numberPad)
-                        .onChange(of: cost) { _, newValue in
-                            cost = newValue.filter { "0123456789".contains($0) }
-                        }
-                        .padding(16)
-                        .background(Color.themePrimary.opacity(0.05))
-                        .cornerRadius(16)
-                }
+                StyledTextField(label: "CAPACITY", placeholder: "Max pax", text: $maxCapacity, keyboardType: .numberPad, numbersOnly: true)
+                StyledTextField(label: "TOTAL COST (IDR)", placeholder: "E.g. 50000", text: $cost, keyboardType: .numberPad, numbersOnly: true)
             }
         }
     }
@@ -426,32 +348,7 @@ struct EditEventView: View {
     }
     
     private var toastNotification: some View {
-        VStack {
-            HStack(spacing: 12) {
-                Image(systemName: "sparkles")
-                    .font(.title3)
-                    .foregroundColor(.themePrimary)
-                
-                Text("Activity successfully updated!")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.themeText)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(.ultraThinMaterial)
-            .cornerRadius(30)
-            .overlay(
-                RoundedRectangle(cornerRadius: 30)
-                    .stroke(Color.white.opacity(0.5), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
-            .padding(.top, 16)
-            
-            Spacer()
-        }
-        .transition(.move(edge: .top).combined(with: .opacity))
-        .zIndex(2)
+        ToastView(icon: "sparkles", message: "Activity successfully updated!")
     }
     
     // MARK: - Actions

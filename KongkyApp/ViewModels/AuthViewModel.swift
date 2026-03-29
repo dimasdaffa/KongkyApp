@@ -19,59 +19,71 @@ class AuthViewModel: ObservableObject {
     // Captures errors (like "Wrong Password" or "Email already in use")
     @Published var errorMessage: String?
     
-    init() {
-        // If a user closes the app and opens it tomorrow, it remembers they are logged in!
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+    // The service that handles all authentication operations
+    // TYPE = protocol (AuthServiceProtocol), not the class (AuthService)
+    private let authService: AuthServiceProtocol
+    
+    // ---------------------------------------------------------
+    // DEPENDENCY INJECTION
+    // ---------------------------------------------------------
+    // Default = AuthService() (real Firebase)
+    // For tests/previews, pass in a MockAuthService
+    // ---------------------------------------------------------
+    init(authService: AuthServiceProtocol = AuthService()) {
+        self.authService = authService
+        
+        // Listen for auth state changes (remembers login across app restarts!)
+        authService.listenToAuthState { [weak self] user in
             self?.userSession = user
         }
     }
     
     // MARK: - Sign Up
+    // ---------------------------------------------------------
+    // Delegates to authService.register() and handles the
+    // Result type (.success or .failure) to update UI state.
+    // ---------------------------------------------------------
     func register(email: String, password: String, fullName: String, completion: @escaping (Bool) -> Void) {
-            self.isLoading = true
-            self.errorMessage = nil
-            
-            Auth.auth().createUser(withEmail: email, password: password) { [weak self] result, error in
-                if let error = error {
-                    DispatchQueue.main.async {
-                        self?.isLoading = false
-                        self?.errorMessage = error.localizedDescription
-                        completion(false)
-                    }
-                    return
-                }
+        self.isLoading = true
+        self.errorMessage = nil
+        
+        authService.register(email: email, password: password, fullName: fullName) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.isLoading = false
                 
-                // Save the Full Name directly into their Firebase Profile
-                let changeRequest = result?.user.createProfileChangeRequest()
-                changeRequest?.displayName = fullName
-                changeRequest?.commitChanges { _ in
-                    DispatchQueue.main.async {
-                        self?.isLoading = false
-                        self?.userSession = Auth.auth().currentUser // Force refresh to get the name
-                        completion(true)
-                    }
+                // `switch` on Result is a clean way to handle success/failure
+                switch result {
+                case .success(let user):
+                    self?.userSession = user
+                    completion(true)
+                    
+                case .failure(let error):
+                    self?.errorMessage = error.localizedDescription
+                    completion(false)
                 }
             }
         }
+    }
     
     // MARK: - Log In
     func login(email: String, password: String, completion: @escaping (Bool) -> Void) {
         self.isLoading = true
         self.errorMessage = nil
         
-        Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
+        authService.login(email: email, password: password) { [weak self] result in
             DispatchQueue.main.async {
                 self?.isLoading = false
                 
-                if let error = error {
+                switch result {
+                case .success:
+                    // userSession is already updated by the auth state listener
+                    completion(true)
+                    
+                case .failure(let error):
                     self?.errorMessage = error.localizedDescription
                     print("Login Error: \(error.localizedDescription)")
                     completion(false)
-                    return
                 }
-                
-                // Successfully logged in
-                completion(true)
             }
         }
     }
@@ -79,7 +91,7 @@ class AuthViewModel: ObservableObject {
     // MARK: - Log Out
     func signOut() {
         do {
-            try Auth.auth().signOut()
+            try authService.signOut()
             self.errorMessage = nil
         } catch {
             print("Error signing out: \(error.localizedDescription)")

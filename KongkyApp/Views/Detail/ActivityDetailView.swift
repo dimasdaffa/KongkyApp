@@ -7,7 +7,7 @@
 
 import SwiftUI
 import MapKit
-import FirebaseAuth
+// CurrentUser (Utilities/) instead of calling Auth.auth() directly.
 
 struct ActivityDetailView: View {
     var event: Event
@@ -18,8 +18,9 @@ struct ActivityDetailView: View {
     // Connect to Firebase
     @StateObject private var viewModel = HomeViewModel()
     
+    // Uses CurrentUser facade instead of Auth.auth() directly
     var currentUserEmail: String {
-        Auth.auth().currentUser?.email ?? ""
+        CurrentUser.email
     }
     
     var isJoined: Bool {
@@ -349,7 +350,7 @@ struct ActivityDetailView: View {
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                     
                     // Tell Firebase to add the user
-                    let currentUserName = Auth.auth().currentUser?.displayName ?? "User"
+                    let currentUserName = CurrentUser.displayName
                     var updatedEvent = event
                     updatedEvent.toggleJoin(email: currentUserEmail, name: currentUserName)
                     viewModel.updateEvent(event: updatedEvent)
@@ -403,7 +404,7 @@ struct ActivityDetailView: View {
                 Button("Leave Activity", role: .destructive) {
                     withAnimation(.spring()) {
                         // Tell Firebase to remove the user
-                        let currentUserName = Auth.auth().currentUser?.displayName ?? "User"
+                        let currentUserName = CurrentUser.displayName
                         var updatedEvent = event
                         updatedEvent.toggleJoin(email: currentUserEmail, name: currentUserName)
                         viewModel.updateEvent(event: updatedEvent)
@@ -421,32 +422,7 @@ struct ActivityDetailView: View {
     }
     
     private var toastNotification: some View {
-        VStack {
-            HStack(spacing: 12) {
-                Image(systemName: "ticket.fill")
-                    .font(.title3)
-                    .foregroundColor(.themePrimary)
-                
-                Text("You're on the list! See you there.")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.themeText)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(.ultraThinMaterial)
-            .cornerRadius(30)
-            .overlay(
-                RoundedRectangle(cornerRadius: 30)
-                    .stroke(Color.white.opacity(0.5), lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 8)
-            .padding(.top, 16)
-            
-            Spacer()
-        }
-        .transition(.move(edge: .top).combined(with: .opacity))
-        .zIndex(2)
+        ToastView(icon: "ticket.fill", message: "You're on the list! See you there.")
     }
 }
 
