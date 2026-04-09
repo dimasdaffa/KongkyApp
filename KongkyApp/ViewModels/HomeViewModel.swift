@@ -12,9 +12,6 @@ class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
     @Published var isLoading: Bool = true
     
-    // The service that handles all database operations
-    // Notice the TYPE is the PROTOCOL, not the concrete class!
-    // This is what makes it swappable. 
     private let eventService: EventServiceProtocol
     
     // ---------------------------------------------------------
@@ -29,9 +26,7 @@ class HomeViewModel: ObservableObject {
     }
     
     // ---------------------------------------------------------
-    // READ (Real-time Listener)
-    // ---------------------------------------------------------
-    // Now just delegates to the service — no Firebase code here!
+    // READ
     // ---------------------------------------------------------
     func fetchEvents() {
         eventService.fetchEvents { [weak self] events in
@@ -64,7 +59,7 @@ class HomeViewModel: ObservableObject {
     }
     
     // ---------------------------------------------------------
-    // DUMMY DATA (kept for offline development / previews)
+    // DUMMY DATA
     // ---------------------------------------------------------
     func loadDummyData() {
         self.isLoading = true

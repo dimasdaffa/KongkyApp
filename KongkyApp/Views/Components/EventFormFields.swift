@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-// OOP CONCEPT: "@Binding"
-// These subviews don't OWN the data — the parent View does.
 // @Binding creates a two-way connection: the subview can
 // READ and WRITE the parent's @State variable.
 

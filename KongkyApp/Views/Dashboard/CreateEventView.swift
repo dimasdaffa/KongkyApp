@@ -8,7 +8,6 @@
 import SwiftUI
 import PhotosUI
 import MapKit
-// CurrentUser (from Utilities/) instead of Auth.auth() directly.
 
 struct CreateEventView: View {
     @Environment(\.presentationMode) var presentationMode

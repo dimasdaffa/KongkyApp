@@ -8,11 +8,6 @@
 import Foundation
 import FirebaseAuth
 
-// OOP CONCEPT: "Facade Pattern"
-// A facade is a simple interface that hides complex internals.
-// Instead of `Auth.auth().currentUser?.email ?? ""`, just use
-// `CurrentUser.email`. Same result, much cleaner
-
 struct CurrentUser {
     
     /// The current user's email, or empty string if not logged in.

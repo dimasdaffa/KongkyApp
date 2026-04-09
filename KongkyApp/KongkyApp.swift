@@ -34,10 +34,10 @@ struct KongkyApp: App {
                     // Show Splash first
                     SplashView(isActive: $splashFinished)
                 } else if !isAuthenticated {
-                    // If splash is done but they aren't logged in, show Auth!
+                    // If splash is done but they aren't logged in, show Auth
                     LoginView(isAuthenticated: $isAuthenticated)
                 } else {
-                    // If they are logged in, send them into the app!
+                    // If they are logged in, send them into the app
                     OnboardingInterestsView(isAuthenticated: $isAuthenticated)
                 }
             }

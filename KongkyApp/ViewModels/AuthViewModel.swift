@@ -10,13 +10,8 @@ import FirebaseAuth
 import Combine
 
 class AuthViewModel: ObservableObject {
-    // Tracks the current logged-in user
     @Published var userSession: FirebaseAuth.User?
-    
-    // Tracks loading states for your buttons
     @Published var isLoading = false
-    
-    // Captures errors (like "Wrong Password" or "Email already in use")
     @Published var errorMessage: String?
     
     // The service that handles all authentication operations
@@ -39,10 +34,6 @@ class AuthViewModel: ObservableObject {
     }
     
     // MARK: - Sign Up
-    // ---------------------------------------------------------
-    // Delegates to authService.register() and handles the
-    // Result type (.success or .failure) to update UI state.
-    // ---------------------------------------------------------
     func register(email: String, password: String, fullName: String, completion: @escaping (Bool) -> Void) {
         self.isLoading = true
         self.errorMessage = nil

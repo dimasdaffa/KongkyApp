@@ -23,13 +23,13 @@ struct MyActivitiesView: View {
     @State private var showCancelSheet = false
     @State private var eventToLeave: Event? = nil
     
-    // NEW: Delete States
+    // Delete States
     @State private var showDeleteAlert = false
     @State private var eventToDelete: Event? = nil
     
     // Toast States
     @State private var showToast = false
-    @State private var toastMessage = "" // Made dynamic so it can handle both actions!
+    @State private var toastMessage = ""
     
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -107,7 +107,7 @@ struct MyActivitiesView: View {
         } message: { event in
             Text("Give up your spot for \(event.title)?")
         }
-        // ALERT 2: DELETING AN ACTIVITY (NEW!)
+        // ALERT 2: DELETING AN ACTIVITY 
         .alert(
             "Delete Activity?",
             isPresented: $showDeleteAlert,

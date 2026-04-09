@@ -15,7 +15,6 @@ struct EditEventView: View {
     
     let event: Event
     
-    // Form State
     @State private var title = ""
     @State private var description = ""
     @State private var locationText = ""

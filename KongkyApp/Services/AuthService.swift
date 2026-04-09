@@ -10,23 +10,11 @@ import FirebaseAuth
 
 class AuthService: AuthServiceProtocol {
     
-    // MARK: - Current User
-    // ---------------------------------------------------------
-    // A quick way to check who's currently logged in.
-    // Returns nil if nobody is logged in.
-    // ---------------------------------------------------------
     var currentUser: FirebaseAuth.User? {
         return Auth.auth().currentUser
     }
     
     // MARK: - Listen to Auth State
-    // ---------------------------------------------------------
-    // Firebase remembers if a user was logged in even after
-    // the app closes. This listener fires:
-    // 1. When the app starts (tells us if someone is logged in)
-    // 2. When someone logs in
-    // 3. When someone logs out
-    // ---------------------------------------------------------
     func listenToAuthState(completion: @escaping (FirebaseAuth.User?) -> Void) {
         Auth.auth().addStateDidChangeListener { _, user in
             completion(user)
@@ -34,15 +22,6 @@ class AuthService: AuthServiceProtocol {
     }
     
     // MARK: - Register
-    // ---------------------------------------------------------
-    // Creates a new account with email + password, then saves
-    // the user's full name into their Firebase profile.
-    //
-    // We use `Result<User, Error>` so the caller (ViewModel)
-    // can easily handle success or failure:
-    //   .success(user) → registration worked, here's the user
-    //   .failure(error) → something went wrong, here's why
-    // ---------------------------------------------------------
     func register(email: String, password: String, fullName: String,
                   completion: @escaping (Result<FirebaseAuth.User, Error>) -> Void) {
         
@@ -70,9 +49,6 @@ class AuthService: AuthServiceProtocol {
     }
     
     // MARK: - Login
-    // ---------------------------------------------------------
-    // Signs in an existing user with their email and password.
-    // ---------------------------------------------------------
     func login(email: String, password: String,
                completion: @escaping (Result<FirebaseAuth.User, Error>) -> Void) {
         
@@ -91,10 +67,6 @@ class AuthService: AuthServiceProtocol {
     }
     
     // MARK: - Sign Out
-    // ---------------------------------------------------------
-    // Logs out the current user. This is a throwing function
-    // because Firebase's signOut() can fail (rare, but possible).
-    // ---------------------------------------------------------
     func signOut() throws {
         try Auth.auth().signOut()
     }

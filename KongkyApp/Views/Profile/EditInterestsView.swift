@@ -21,7 +21,7 @@ struct EditInterestsView: View {
     
     @State private var selectedCategories: Set<String> = ["Board Game", "Sport", "Tea Time"]
     
-    // NEW: Toast & Success States
+    // Toast & Success States
     @State private var isSaved = false
     @State private var showToast = false
     

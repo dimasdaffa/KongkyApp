@@ -25,7 +25,7 @@ struct SavedEventsView: View {
                 
                 VStack(spacing: 0) {
                     
-                    // --- NEW: HIG COMPLIANT STATS ROW ---
+                    // --- HIG COMPLIANT STATS ROW ---
                     statsHeader(count: savedEvents.count)
                     
                     // --- CONTENT ---
@@ -97,7 +97,7 @@ struct SavedEventsView: View {
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 40)
             
-            // NEW ACTIONABLE BUTTON
+            // ACTIONABLE BUTTON
             Button(action: {
                 selectedTab = 0 // Switch to Home Tab
                 presentationMode.wrappedValue.dismiss() // Close the Saved Events page

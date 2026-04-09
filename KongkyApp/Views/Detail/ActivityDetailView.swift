@@ -7,7 +7,6 @@
 
 import SwiftUI
 import MapKit
-// CurrentUser (Utilities/) instead of calling Auth.auth() directly.
 
 struct ActivityDetailView: View {
     var event: Event
