@@ -77,8 +77,25 @@ struct ActivityDetailView: View {
     private var heroSection: some View {
         ZStack(alignment: .top) {
             ZStack {
-                Rectangle()
-                    .fill(Color(.systemGray4))
+                if let imageURLString = event.imageURL, let url = URL(string: imageURLString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            Color(.systemGray5) // Simple gray while loading
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        case .failure:
+                            Color(.systemGray4)
+                        @unknown default:
+                            Color(.systemGray4)
+                        }
+                    }
+                } else {
+                    Rectangle().fill(Color(.systemGray4))
+                }
+                
                 LinearGradient(
                     colors: [.clear, .white.opacity(0.6), .white],
                     startPoint: .center,
@@ -86,6 +103,7 @@ struct ActivityDetailView: View {
                 )
             }
             .frame(height: 340)
+            .clipped() // Image doesn't bleed down text
             
             HStack {
                 HStack(spacing: 6) {

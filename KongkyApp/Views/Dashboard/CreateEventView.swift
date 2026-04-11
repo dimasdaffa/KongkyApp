@@ -38,6 +38,7 @@ struct CreateEventView: View {
     
     @State private var isCreated = false
     @State private var showToast = false
+    @State private var isUploading = false
     
     // Validation Check
     private var isFormValid: Bool {
@@ -292,14 +293,20 @@ struct CreateEventView: View {
         VStack {
             Button(action: {
                 if isFormValid && !isCreated {
+                    isUploading = true
                     saveEvent()
                 }
             }) {
                 HStack {
-                    if isCreated {
+                    if isUploading {
+                        ProgressView().tint(.white)
+                        Text("Uploading...")
+                    } else if isCreated {
                         Image(systemName: "checkmark.circle.fill")
+                        Text("Activity Created")
+                    } else {
+                        Text("Create Activity")
                     }
-                    Text(isCreated ? "Activity Created" : "Create Activity")
                 }
                 .font(.headline)
                 .foregroundColor(isCreated ? .themeTextVariant : .white)
@@ -312,7 +319,7 @@ struct CreateEventView: View {
             }
             .buttonStyle(SpringyButtonStyle())
             // Lock the button until form is valid
-            .disabled(!isFormValid || isCreated)
+            .disabled(!isFormValid || isCreated || isUploading)
         }
         .padding(.horizontal, 20)
         .padding(.top, 16)
@@ -339,9 +346,7 @@ struct CreateEventView: View {
         tf.dateFormat = "HH:mm"
         let startString = tf.string(from: selectedStartTime)
         let endString = tf.string(from: selectedEndTime)
-        let formattedTime = "\(startString) - \(endString)" // Creates "19:00 - 21:00"
-        
-        // Using CurrentUser helper instead of Auth.auth() directly (Facade Pattern)
+        let formattedTime = "\(startString) - \(endString)"
         let currentUserEmail = CurrentUser.email
         let currentUserName = CurrentUser.displayName
         let newEvent = Event(
@@ -360,7 +365,23 @@ struct CreateEventView: View {
         
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         
-        viewModel.addEvent(event: newEvent)
+        viewModel.addEvent(event: newEvent, image: previewImage){
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+            // Animation after upload finish
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                isUploading = false
+                isCreated = true
+                showToast = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                withAnimation(.easeInOut(duration: 03)){
+                    showToast = false
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            }
+        }
         
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
             isCreated = true

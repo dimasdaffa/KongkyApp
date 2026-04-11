@@ -7,6 +7,8 @@
 
 import Foundation
 import FirebaseFirestore
+import FirebaseStorage
+import UIKit
 
 class EventService: EventServiceProtocol {
     
@@ -63,6 +65,32 @@ class EventService: EventServiceProtocol {
         db.collection(collectionName).document(documentId).delete { error in
             if let error = error {
                 print("EventService: Error deleting event: \(error)")
+            }
+        }
+    }
+    
+    func uploadImage(_ image: UIImage, completion: @escaping (String?) -> Void) {
+        // 1. Compress the image
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            completion(nil)
+            return
+        }
+        
+        // 2. Create a unique file name
+        let filename = UUID().uuidString
+        let storageRef = Storage.storage().reference().child("activity_images/\(filename).jpg")
+        
+        // 3. Upload to Firebase Storage
+        storageRef.putData(imageData, metadata: nil) { metadata, error in
+            if let error = error {
+                print("Failed to upload image: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            
+            // 4. Get the URL back
+            storageRef.downloadURL { url, error in
+                completion(url?.absoluteString)
             }
         }
     }

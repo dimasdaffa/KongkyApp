@@ -16,11 +16,38 @@ struct DashboardEventCard: View {
             
             // 1. TOP IMAGE AREA
             ZStack(alignment: .top) {
-                // Placeholder for your real images.
-                // We use a gray rectangle for now, but you will swap this with AsyncImage later!
-                Rectangle()
-                    .fill(Color(.systemGray4))
-                    .frame(height: 180)
+                if let imageURLString = event.imageURL, let url = URL(string: imageURLString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            // Shows a spinner while downloading
+                            ProgressView()
+                                .frame(height: 180)
+                                .frame(maxWidth: .infinity)
+                                .background(Color(.systemGray6))
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 180)
+                                .frame(maxWidth: .infinity)
+                                .clipped()
+                        case .failure:
+                            // Fallback if the link is broken
+                            Rectangle()
+                                .fill(Color(.systemGray4))
+                                .frame(height: 180)
+                                .overlay(Image(systemName: "photo.badge.exclamationmark").foregroundColor(.gray))
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
+                } else {
+                    // Fallback for older activities that don't have an image
+                    Rectangle()
+                        .fill(Color(.systemGray4))
+                        .frame(height: 180)
+                }
                 
                 // Top Overlay elements (Category Pill & Heart)
                 HStack(alignment: .top) {
@@ -79,28 +106,28 @@ struct DashboardEventCard: View {
                 HStack(alignment: .bottom) {
                     // Price Area - Styled exactly like your design!
                     HStack(alignment: .bottom, spacing: 4) {
-                            if event.currentIndividualPrice == 0 {
-                                Text("Free")
+                        if event.currentIndividualPrice == 0 {
+                            Text("Free")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .foregroundColor(.themePrimary)
+                        } else {
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(event.formatPrice(event.currentIndividualPrice))
                                     .font(.title3)
                                     .fontWeight(.bold)
                                     .foregroundColor(.themePrimary)
-                            } else {
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text(event.formatPrice(event.currentIndividualPrice))
-                                        .font(.title3)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.themePrimary)
-                                    Text("IDR")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.themePrimary)
-                                }
-                                Text("/ pax")
+                                Text("IDR")
                                     .font(.caption)
-                                    .foregroundColor(.themeTextVariant)
-                                    .padding(.bottom, 2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.themePrimary)
                             }
+                            Text("/ pax")
+                                .font(.caption)
+                                .foregroundColor(.themeTextVariant)
+                                .padding(.bottom, 2)
                         }
+                    }
                     
                     Spacer()
                     

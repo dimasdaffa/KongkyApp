@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 protocol EventServiceProtocol {
     
@@ -21,4 +22,6 @@ protocol EventServiceProtocol {
     
     /// Delete an event from the database.
     func deleteEvent(_ event: Event)
+    
+    func uploadImage(_ image: UIImage, completion: @escaping (String?) -> Void)
 }

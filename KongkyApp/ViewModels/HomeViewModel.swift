@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 class HomeViewModel: ObservableObject {
     @Published var events: [Event] = []
@@ -40,8 +41,30 @@ class HomeViewModel: ObservableObject {
     // ---------------------------------------------------------
     // CREATE
     // ---------------------------------------------------------
-    func addEvent(event: Event) {
-        eventService.addEvent(event)
+    func addEvent(event: Event, image: UIImage? = nil, completion: @escaping () -> Void) {
+        var newEvent = event
+        if let image = image {
+                    // 1. Upload the image first
+                    eventService.uploadImage(image) { [weak self] imageUrl in
+                        // 2. Attach the generated URL to the event
+                        newEvent.imageURL = imageUrl
+                        
+                        // 3. Save the completed event using the Service Layer
+                        self?.eventService.addEvent(newEvent)
+                        
+                        // 4. Tell the UI it's done
+                        DispatchQueue.main.async {
+                            completion()
+                        }
+                    }
+                } else {
+                    // If no image was selected, just save it normally via Service Layer
+                    self.eventService.addEvent(newEvent)
+                    
+                    DispatchQueue.main.async {
+                        completion()
+                    }
+                }
     }
     
     // ---------------------------------------------------------
