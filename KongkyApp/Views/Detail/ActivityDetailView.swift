@@ -17,6 +17,10 @@ struct ActivityDetailView: View {
     // Connect to Firebase
     @StateObject private var viewModel = HomeViewModel()
     
+    var liveEvent: Event {
+            viewModel.events.first(where: { $0.id == event.id }) ?? event
+        }
+    
     // Uses CurrentUser facade instead of Auth.auth() directly
     var currentUserEmail: String {
         CurrentUser.email
@@ -81,7 +85,11 @@ struct ActivityDetailView: View {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
-                            Color(.systemGray5) // Simple gray while loading
+                            ZStack {
+                                Color(.systemGray6)
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                            }
                         case .success(let image):
                             image
                                 .resizable()
@@ -92,6 +100,7 @@ struct ActivityDetailView: View {
                             Color(.systemGray4)
                         }
                     }
+                    .id(url)
                 } else {
                     Rectangle().fill(Color(.systemGray4))
                 }

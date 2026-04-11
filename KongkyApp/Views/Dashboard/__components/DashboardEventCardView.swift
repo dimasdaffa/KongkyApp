@@ -42,6 +42,7 @@ struct DashboardEventCard: View {
                             EmptyView()
                         }
                     }
+                    .id(url)
                 } else {
                     // Fallback for older activities that don't have an image
                     Rectangle()

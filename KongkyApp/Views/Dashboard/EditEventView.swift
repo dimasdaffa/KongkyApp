@@ -35,6 +35,7 @@ struct EditEventView: View {
     
     @State private var isUpdated = false
     @State private var showToast = false
+    @State private var isUploading = false
     
     // Validation Check
     private var isFormValid: Bool {
@@ -157,6 +158,24 @@ struct EditEventView: View {
                         .scaledToFill()
                         .frame(maxWidth: .infinity, maxHeight: 220)
                         .clipShape(RoundedRectangle(cornerRadius: 24))
+                } else if let imageURLString = event.imageURL, let url = URL(string: imageURLString) {
+                    // 2. Show the old Firebase image if no new one is picked yet
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .empty:
+                            ProgressView()
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity, maxHeight: 220)
+                                .clipShape(RoundedRectangle(cornerRadius: 24))
+                        case .failure:
+                            Image(systemName: "photo.badge.exclamationmark").foregroundColor(.gray)
+                        @unknown default:
+                            EmptyView()
+                        }
+                    }
                 } else {
                     VStack(spacing: 8) {
                         Image(systemName: "camera.viewfinder")
@@ -320,14 +339,20 @@ struct EditEventView: View {
         VStack {
             Button(action: {
                 if isFormValid && !isUpdated {
+                    isUploading = true
                     updateEvent()
                 }
             }) {
                 HStack {
-                    if isUpdated {
+                    if isUploading {
+                        ProgressView().tint(.white)
+                        Text("Uploading...")
+                    } else if isUpdated {
                         Image(systemName: "checkmark.circle.fill")
+                        Text("Activity Updated")
+                    } else {
+                        Text("Update Activity")
                     }
-                    Text(isUpdated ? "Activity Updated" : "Update Activity")
                 }
                 .font(.headline)
                 .foregroundColor(isUpdated ? .themeTextVariant : .white)
@@ -374,26 +399,27 @@ struct EditEventView: View {
         updatedEvent.category = category
         updatedEvent.maxCapacity = Int(maxCapacity) ?? event.maxCapacity
         
-        //        Dummy
-        //        if let index = viewModel.events.firstIndex(where: { $0.id == event.id }) {
-        //            viewModel.events[index] = updatedEvent
-        //        }
-        viewModel.updateEvent(event: updatedEvent)
         
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-        
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
-            isUpdated = true
-            showToast = true
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showToast = false
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                presentationMode.wrappedValue.dismiss()
+        viewModel.updateEvent(event: updatedEvent, image: previewImage) { [self] in
+            DispatchQueue.main.async {
+                isUploading = false
+                
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+                    isUpdated = true
+                    showToast = true
+                }
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        showToast = false
+                    }
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                }
             }
         }
     }

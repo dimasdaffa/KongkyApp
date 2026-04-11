@@ -44,34 +44,46 @@ class HomeViewModel: ObservableObject {
     func addEvent(event: Event, image: UIImage? = nil, completion: @escaping () -> Void) {
         var newEvent = event
         if let image = image {
-                    // 1. Upload the image first
-                    eventService.uploadImage(image) { [weak self] imageUrl in
-                        // 2. Attach the generated URL to the event
-                        newEvent.imageURL = imageUrl
-                        
-                        // 3. Save the completed event using the Service Layer
-                        self?.eventService.addEvent(newEvent)
-                        
-                        // 4. Tell the UI it's done
-                        DispatchQueue.main.async {
-                            completion()
-                        }
-                    }
-                } else {
-                    // If no image was selected, just save it normally via Service Layer
-                    self.eventService.addEvent(newEvent)
-                    
-                    DispatchQueue.main.async {
-                        completion()
-                    }
+            // 1. Upload the image first
+            eventService.uploadImage(image) { [weak self] imageUrl in
+                // 2. Attach the generated URL to the event
+                newEvent.imageURL = imageUrl
+                
+                // 3. Save the completed event using the Service Layer
+                self?.eventService.addEvent(newEvent)
+                
+                // 4. Tell the UI it's done
+                DispatchQueue.main.async {
+                    completion()
                 }
+            }
+        } else {
+            // If no image was selected, just save it normally via Service Layer
+            self.eventService.addEvent(newEvent)
+            
+            DispatchQueue.main.async {
+                completion()
+            }
+        }
     }
     
     // ---------------------------------------------------------
     // UPDATE
     // ---------------------------------------------------------
-    func updateEvent(event: Event) {
-        eventService.updateEvent(event)
+    func updateEvent(event: Event, image: UIImage? = nil, completion: @escaping () -> Void = {}) {
+        var updatedEvent = event
+        if let image = image {
+            // 1. If they picked a NEW image, upload it
+            eventService.uploadImage(image) { [weak self] imageUrl in
+                updatedEvent.imageURL = imageUrl // Overwrite the old URL
+                self?.eventService.updateEvent(updatedEvent)
+                DispatchQueue.main.async { completion() }
+            }
+        } else {
+            // 2. If no new image, just update the text details
+            eventService.updateEvent(updatedEvent)
+            DispatchQueue.main.async { completion() }
+        }
     }
     
     // ---------------------------------------------------------
